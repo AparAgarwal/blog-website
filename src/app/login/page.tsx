@@ -8,10 +8,14 @@ export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setError('')
+        setIsLoading(true)
+
         try {
             const res = await signIn('credentials', {
                 email,
@@ -20,14 +24,23 @@ export default function LoginPage() {
             })
 
             if (res?.error) {
-                setError('Invalid credentials')
+                // Display the actual error message from backend
+                setError(res.error)
+                setIsLoading(false)
                 return
             }
 
-            router.push('/admin')
-            router.refresh()
+            if (res?.ok) {
+                // Success - redirect to admin
+                router.push('/admin')
+                router.refresh()
+            } else {
+                setError('An unexpected error occurred')
+                setIsLoading(false)
+            }
         } catch (error) {
-            setError('Something went wrong')
+            setError('Something went wrong. Please try again.')
+            setIsLoading(false)
         }
     }
 
@@ -43,7 +56,16 @@ export default function LoginPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                            disabled={isLoading}
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '4px',
+                                border: '1px solid var(--border-color)',
+                                background: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                opacity: isLoading ? 0.6 : 1
+                            }}
                         />
                     </div>
                     <div>
@@ -53,15 +75,65 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                            disabled={isLoading}
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '4px',
+                                border: '1px solid var(--border-color)',
+                                background: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                opacity: isLoading ? 0.6 : 1
+                            }}
                         />
                     </div>
-                    {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
-                    <button type="submit" className="view-all-btn" style={{ width: '100%', cursor: 'pointer' }}>
-                        Sign In
+                    {error && (
+                        <div style={{
+                            padding: '12px',
+                            borderRadius: '4px',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            color: '#ef4444',
+                            fontSize: '14px'
+                        }}>
+                            {error}
+                        </div>
+                    )}
+                    <button
+                        type="submit"
+                        className="view-all-btn"
+                        disabled={isLoading}
+                        style={{
+                            width: '100%',
+                            cursor: isLoading ? 'not-allowed' : 'pointer',
+                            opacity: isLoading ? 0.7 : 1,
+                            position: 'relative'
+                        }}
+                    >
+                        {isLoading ? (
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <span style={{
+                                    display: 'inline-block',
+                                    width: '16px',
+                                    height: '16px',
+                                    border: '2px solid rgba(255,255,255,0.3)',
+                                    borderTopColor: 'white',
+                                    borderRadius: '50%',
+                                    animation: 'spin 0.6s linear infinite'
+                                }}></span>
+                                Verifying...
+                            </span>
+                        ) : (
+                            'Sign In'
+                        )}
                     </button>
                 </form>
             </div>
+            <style jsx>{`
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     )
 }

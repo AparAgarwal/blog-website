@@ -1,7 +1,7 @@
 import prisma from '@/lib/db'
 
 /**
- * Rate limiting with exponential backoff
+ * Simple rate limiting
  * @param key - Unique identifier (e.g., email address)
  * @param limit - Max attempts allowed
  * @param windowSeconds - Time window in seconds
@@ -16,7 +16,6 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
         where: { key }
     })
 
-    // Check if limit exceeded
     if (rateLimit) {
         // Entry expired, delete and allow
         if (rateLimit.expiresAt < now) {
@@ -26,26 +25,12 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
             })
             return true
         }
-        
-        // Limit exceeded - apply exponential backoff
+
+        // Limit exceeded - reject
         if (rateLimit.count >= limit) {
-            // Extend expiration time with exponential backoff
-            // Each additional attempt doubles the wait time
-            const attempts = rateLimit.count - limit + 1
-            const backoffMultiplier = Math.min(Math.pow(2, attempts), 32) // Cap at 32x
-            const newExpiresAt = new Date(now.getTime() + (windowSeconds * backoffMultiplier * 1000))
-            
-            await prisma.rateLimit.update({
-                where: { key },
-                data: { 
-                    count: { increment: 1 },
-                    expiresAt: newExpiresAt
-                }
-            })
-            
             return false
         }
-        
+
         // Increment counter
         await prisma.rateLimit.update({
             where: { key },
@@ -56,14 +41,6 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
         await prisma.rateLimit.create({
             data: { key, count: 1, expiresAt }
         })
-    }
-
-    // Periodically clean up expired entries (10% chance)
-    if (Math.random() < 0.1) {
-        // Run cleanup in background, don't await
-        prisma.rateLimit.deleteMany({
-            where: { expiresAt: { lt: now } }
-        }).catch(() => {}) // Silently fail cleanup
     }
 
     return true // Allowed

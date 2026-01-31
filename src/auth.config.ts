@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
                     return null;
                 }
 
-                // Rate limiting: 5 attempts per 10 minutes with exponential backoff
+                // Rate limiting: 5 attempts per 10 minutes
                 const allowed = await checkRateLimit(credentials.email, 5, 600);
                 if (!allowed) {
                     const remainingTime = await getRateLimitInfo(credentials.email);
@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
                 );
 
                 if (!user || !isPasswordValid) {
-                    return null;
+                    throw new Error('Invalid email or password');
                 }
 
                 return {
@@ -72,4 +72,7 @@ export const authOptions: NextAuthOptions = {
         }
     },
     secret: process.env.NEXTAUTH_SECRET,
+    // @ts-ignore - trustHost is valid but may not be in type definitions
+    trustHost: true, // Required for Vercel deployments
 };
+
