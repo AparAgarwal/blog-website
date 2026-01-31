@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Post } from '@prisma/client';
 import { fetchPosts } from '@/app/actions';
+import Spinner from './Spinner';
 
 type ViewMode = 'grid' | 'list';
 
@@ -12,13 +13,15 @@ interface PostListProps {
     showToggle?: boolean;
     headerContent?: React.ReactNode;
     footerContent?: React.ReactNode;
+    enableInfiniteScroll?: boolean;
 }
 
-export default function PostList({ posts: initialPosts, showToggle = true, headerContent, footerContent }: PostListProps) {
+export default function PostList({ posts: initialPosts, showToggle = true, headerContent, footerContent, enableInfiniteScroll = false }: PostListProps) {
     const [posts, setPosts] = useState<Post[]>(initialPosts);
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [visiblePosts, setVisiblePosts] = useState<Set<string>>(new Set());
     const [footerVisible, setFooterVisible] = useState(false);
+    const [headerVisible, setHeaderVisible] = useState(false);
 
     // Pagination state
     const [page, setPage] = useState(1);
@@ -28,13 +31,15 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
 
     // Initial check for hasMore
     useEffect(() => {
-        if (initialPosts.length < 12) {
+        if (!enableInfiniteScroll || initialPosts.length < 12) {
             setHasMore(false);
         }
-    }, [initialPosts]);
+    }, [initialPosts, enableInfiniteScroll]);
 
     // Infinite Scroll Observer
     useEffect(() => {
+        if (!enableInfiniteScroll) return;
+
         const observer = new IntersectionObserver(
             async (entries) => {
                 if (entries[0].isIntersecting && hasMore && !loading) {
@@ -65,7 +70,7 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
         }
 
         return () => observer.disconnect();
-    }, [page, loading, hasMore]);
+    }, [page, loading, hasMore, enableInfiniteScroll]);
 
     // Observer for posts visibility animation
     useEffect(() => {
@@ -87,6 +92,20 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
         return () => observer.disconnect();
     }, [posts, viewMode]);
 
+    // Observer for header
+    const headerRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                setHeaderVisible(true);
+                observer.disconnect();
+            }
+        }, { threshold: 0.1 });
+
+        if (headerRef.current) observer.observe(headerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
     // Observer for footer
     const footerRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -103,7 +122,7 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
 
     return (
         <>
-            <div className="posts-header-container">
+            <div ref={headerRef} className={`posts-header-container ${headerVisible ? 'visible' : ''} ${headerVisible ? 'hero-delay-header' : ''}`}>
                 <div className="posts-header-content">
                     {headerContent}
                 </div>
@@ -149,6 +168,7 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
                             key={post.id}
                             data-id={post.id}
                             className={`post-card ${isVisible ? 'visible' : ''} ${delayClass}`}
+                            aria-labelledby={`post-title-${post.id}`}
                         >
                             <div className="post-meta">
                                 <time className="post-date" dateTime={post.createdAt.toISOString()}>
@@ -157,20 +177,20 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
                             </div>
 
                             <div className="post-info">
-                                <h2 className="post-title">
+                                <h2 id={`post-title-${post.id}`} className="post-title">
                                     <Link href={`/posts/${post.slug}`} className="post-link">{post.title}</Link>
                                 </h2>
                                 <p className="post-excerpt">
                                     {post.excerpt}
                                 </p>
                                 <div className="post-footer">
-                                    <div className="post-tags-container">
-                                        {post.tags && post.tags.length > 0 ? (
-                                            post.tags.split(',').filter(tag => tag.trim()).slice(0, 3).map((tag: string) => (
-                                                <span key={tag} className="post-tag-pill">{tag.trim()}</span>
-                                            ))
-                                        ) : null}
-                                    </div>
+                                    {post.tags && post.tags.length > 0 && (
+                                        <div className="post-tags-container" role="list" aria-label="Post tags">
+                                            {post.tags.split(',').filter(tag => tag.trim()).slice(0, 3).map((tag: string) => (
+                                                <span key={tag} className="post-tag-pill" role="listitem">{tag.trim()}</span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </article>
@@ -178,15 +198,31 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
                 })}
             </div>
 
-            {/* Loading Spinner / Sentinel */}
-            <div ref={observerTarget} style={{ height: '50px', margin: '20px 0', textAlign: 'center' }}>
-                {loading && <p>Loading more posts...</p>}
-                {!hasMore && posts.length > 0 && <p style={{ color: '#666', opacity: 0 }}>End of content</p>}
-            </div>
+            {/* Infinite scroll trigger and loading state */}
+            {hasMore && (
+                <div ref={observerTarget} style={{ height: '20px', margin: '40px 0' }} />
+            )}
 
-            <div ref={footerRef} className={`view-all-btn-anim ${footerVisible ? 'visible' : ''} ${footerVisible ? 'hero-delay-view-all' : ''}`}>
-                {footerContent}
-            </div>
+            {loading && (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }} role="status" aria-live="polite" aria-label="Loading more posts">
+                    <Spinner size={40} color="var(--text-tertiary)" borderWidth={3} />
+                    <span className="sr-only">Loading more posts...</span>
+                </div>
+            )}
+
+            {/* Footer content - View All button for home, End of content for archive */}
+            {footerContent && (
+                <div ref={footerRef} className={`view-all-btn-anim ${footerVisible ? 'visible' : ''} ${footerVisible ? 'hero-delay-view-all' : ''}`}>
+                    {footerContent}
+                </div>
+            )}
+
+            {/* End of content message for archive page only */}
+            {!hasMore && !footerContent && posts.length > 0 && (
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
+                    <p style={{ fontSize: '16px', fontFamily: 'Outfit, sans-serif' }}>— End of content —</p>
+                </div>
+            )}
         </>
     );
 }
