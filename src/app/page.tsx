@@ -31,7 +31,7 @@ async function getHomePageData() {
         }));
 
         return { posts, featuredTopics };
-    } catch (error) {
+    } catch (_error) {
         // Error logged on server, return empty data to prevent crash
         return { posts: [], featuredTopics: [] };
     }

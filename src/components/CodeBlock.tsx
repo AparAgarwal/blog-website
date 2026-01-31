@@ -16,7 +16,7 @@ const CodeBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAtt
             await navigator.clipboard.writeText(text);
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
-        } catch (err) {
+        } catch (_err) {
             // Silently fail - copy functionality not critical
         }
     };

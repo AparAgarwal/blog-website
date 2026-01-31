@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 
 // Protect all admin routes with NextAuth middleware
 export default withAuth(
-  function middleware(req) {
+  function middleware(_req) {
     // Additional custom logic can go here if needed
     return NextResponse.next()
   },

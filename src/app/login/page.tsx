@@ -39,7 +39,7 @@ export default function LoginPage() {
                 setError('An unexpected error occurred')
                 setIsLoading(false)
             }
-        } catch (error) {
+        } catch (_error) {
             setError('Something went wrong. Please try again.')
             setIsLoading(false)
         }

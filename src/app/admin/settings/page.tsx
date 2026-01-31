@@ -52,7 +52,7 @@ export default function SettingsPage() {
                 toast.error(result.message || 'Failed to change password')
                 setLoading(false)
             }
-        } catch (error) {
+        } catch (_error) {
             toast.error('An error occurred while changing password')
             setLoading(false)
         }

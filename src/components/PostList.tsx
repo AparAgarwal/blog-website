@@ -55,7 +55,7 @@ export default function PostList({ posts: initialPosts, showToggle = true, heade
                             setPosts(prev => [...prev, ...nextPosts]);
                             setPage(prev => prev + 1);
                         }
-                    } catch (error) {
+                    } catch (_error) {
                         // Error loading posts - fail silently
                     } finally {
                         setLoading(false);

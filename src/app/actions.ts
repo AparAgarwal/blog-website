@@ -2,7 +2,6 @@
 
 import prisma from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth.config'
 import { z, ZodError } from 'zod'
@@ -147,7 +146,7 @@ export async function fetchPosts(page: number, limit: number) {
             skip: (page - 1) * limit,
         });
         return posts;
-    } catch (error) {
+    } catch (_error) {
         return [];
     }
 }

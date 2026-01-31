@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         };
     }
 
-    const description = post.content.substring(0, 160).replace(/[#*`\[\]]/g, '') + '...';
+    const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
     const publishedTime = post.createdAt.toISOString();
     const modifiedTime = post.updatedAt.toISOString();
 
