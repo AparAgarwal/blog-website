@@ -1,0 +1,10 @@
+.next
+out
+build
+node_modules
+.git
+*.log
+.env*
+package-lock.json
+prisma/migrations
+public
