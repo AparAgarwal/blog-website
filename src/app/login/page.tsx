@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Spinner from '@/components/Spinner'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -112,15 +113,7 @@ export default function LoginPage() {
                     >
                         {isLoading ? (
                             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                <span style={{
-                                    display: 'inline-block',
-                                    width: '16px',
-                                    height: '16px',
-                                    border: '2px solid rgba(255,255,255,0.3)',
-                                    borderTopColor: 'white',
-                                    borderRadius: '50%',
-                                    animation: 'spin 0.6s linear infinite'
-                                }}></span>
+                                <Spinner size={16} color="white" />
                                 Verifying...
                             </span>
                         ) : (
@@ -129,11 +122,6 @@ export default function LoginPage() {
                     </button>
                 </form>
             </div>
-            <style jsx>{`
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
         </div>
     )
 }

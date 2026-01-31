@@ -37,29 +37,29 @@ export default function HeroSection({ topics }: { topics: Topic[] }) {
     }, []);
 
     return (
-        <section id="hero" aria-label="Hero section" ref={sectionRef} className={animationClass}>
+        <section id="hero" aria-labelledby="hero-heading" ref={sectionRef} className={animationClass}>
             <div className="hero-content">
-                <h1 className="hero-title">
-                    <span className="title-light">Engineering notes</span>
+                <h1 id="hero-heading" className="hero-title">
+                    <span className="title-light">Engineering notes </span>
                     <span className="title-bold"><BreakingText text="breaking" /> and building</span>
-                    <span className="title-light">things.</span>
+                    <span className="title-light"> things.</span>
                 </h1>
                 <p className="hero-subtitle">Mostly backend, systems, and things I misunderstood at first.</p>
                 <p className="hero-subtitle">This is a collection of notes I write while learning backend systems. Written
                     for clarity, not completeness.</p>
 
-                <div className="featured-topics">
-                    <ul className="topics-list">
+                <nav className="featured-topics" aria-label="Featured topics">
+                    <ul className="topics-list" role="list">
                         {topics.map((topic, index) => (
-                            <li className="topic-item" key={index}>
-                                <Link href={topic.href} className="contents">
-                                    <span className="topic-marker">[ ]</span>
+                            <li className="topic-item" key={index} role="listitem">
+                                <Link href={topic.href} className="contents" aria-label={`Read about ${topic.text}`}>
+                                    <span className="topic-marker" aria-hidden="true">[ ]</span>
                                     <span className="topic-text">{topic.text}</span>
                                 </Link>
                             </li>
                         ))}
                     </ul>
-                </div>
+                </nav>
             </div>
         </section>
     );

@@ -1,8 +1,24 @@
+import { Metadata } from 'next';
 import prisma from '@/lib/db';
 import PostList from '@/components/PostList';
 
 // Revalidate every 5 minutes
 export const revalidate = 300;
+
+const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+
+export const metadata: Metadata = {
+    title: 'Archive',
+    description: 'Browse all blog posts about engineering, backend systems, and software development.',
+    openGraph: {
+        title: 'Archive | Apar Agarwal',
+        description: 'Browse all blog posts about engineering, backend systems, and software development.',
+        url: `${baseUrl}/archive`,
+    },
+    alternates: {
+        canonical: `${baseUrl}/archive`,
+    },
+};
 
 async function getAllPosts() {
     const posts = await prisma.post.findMany({
@@ -26,7 +42,11 @@ export default async function ArchivePage() {
     return (
         <div className="archive-hero">
             <div className="posts-section archive-posts">
-                <PostList posts={posts} headerContent={headerContent} />
+                <PostList 
+                    posts={posts} 
+                    headerContent={headerContent} 
+                    enableInfiniteScroll={true}
+                />
             </div>
         </div>
     );

@@ -34,7 +34,7 @@ export default function CursorDot() {
         const animationId = requestAnimationFrame(animateCursor);
 
         // Interaction logic
-        const interactiveElements = document.querySelectorAll("a, button, input, textarea, .hamburger-menu");
+        const interactiveElements = document.querySelectorAll("a, button, input, textarea");
 
         const onMouseEnter = () => cursorDot.classList.add("hidden");
         const onMouseLeave = () => cursorDot.classList.remove("hidden");
