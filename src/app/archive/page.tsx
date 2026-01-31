@@ -42,11 +42,7 @@ export default async function ArchivePage() {
     return (
         <div className="archive-hero">
             <div className="posts-section archive-posts">
-                <PostList 
-                    posts={posts} 
-                    headerContent={headerContent} 
-                    enableInfiniteScroll={true}
-                />
+                <PostList posts={posts} headerContent={headerContent} enableInfiniteScroll={true} />
             </div>
         </div>
     );

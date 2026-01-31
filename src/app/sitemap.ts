@@ -1,8 +1,8 @@
-import { MetadataRoute } from 'next'
-import prisma from '@/lib/db'
+import { MetadataRoute } from 'next';
+import prisma from '@/lib/db';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
     // Get all published posts
     const posts = await prisma.post.findMany({
@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             slug: true,
             createdAt: true,
         },
-    })
+    });
 
     const postsUrls = posts.map((post) => {
         return {
@@ -21,8 +21,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: post.createdAt,
             changeFrequency: 'weekly' as const,
             priority: 0.8,
-        }
-    })
+        };
+    });
 
     return [
         {
@@ -38,5 +38,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.8,
         },
         ...postsUrls,
-    ]
+    ];
 }

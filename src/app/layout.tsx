@@ -1,24 +1,49 @@
-import type { Metadata } from 'next'
-import { Borel, Comfortaa, Gochi_Hand, Outfit, Poppins } from 'next/font/google'
-import './globals.css'
-import RootLayoutClient from './layout-client'
+import type { Metadata } from 'next';
+import { Borel, Comfortaa, Gochi_Hand, Outfit, Poppins } from 'next/font/google';
+import './globals.css';
+import RootLayoutClient from './layout-client';
 
-const borel = Borel({ subsets: ['latin'], weight: '400', variable: '--font-borel', display: 'swap' })
-const comfortaa = Comfortaa({ subsets: ['latin'], weight: ['400', '600'], variable: '--font-comfortaa', display: 'swap' })
-const gochiHand = Gochi_Hand({ subsets: ['latin'], weight: '400', variable: '--font-gochi-hand', display: 'swap' })
-const outfit = Outfit({ subsets: ['latin'], weight: ['200', '300', '400', '500', '600', '700', '800'], variable: '--font-outfit', display: 'swap' })
-const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], variable: '--font-poppins', display: 'swap' })
+const borel = Borel({ subsets: ['latin'], weight: '400', variable: '--font-borel', display: 'swap' });
+const comfortaa = Comfortaa({
+    subsets: ['latin'],
+    weight: ['400', '600'],
+    variable: '--font-comfortaa',
+    display: 'swap',
+});
+const gochiHand = Gochi_Hand({ subsets: ['latin'], weight: '400', variable: '--font-gochi-hand', display: 'swap' });
+const outfit = Outfit({
+    subsets: ['latin'],
+    weight: ['200', '300', '400', '500', '600', '700', '800'],
+    variable: '--font-outfit',
+    display: 'swap',
+});
+const poppins = Poppins({
+    subsets: ['latin'],
+    weight: ['300', '400', '500', '600', '700'],
+    variable: '--font-poppins',
+    display: 'swap',
+});
 
-const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
     metadataBase: new URL(baseUrl),
     title: {
         default: 'Apar Agarwal | Engineering Blog',
-        template: '%s | Apar Agarwal'
+        template: '%s | Apar Agarwal',
     },
-    description: 'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first. Written for clarity, not completeness.',
-    keywords: ['engineering', 'blog', 'backend', 'systems', 'software development', 'programming', 'web development', 'Apar Agarwal'],
+    description:
+        'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first. Written for clarity, not completeness.',
+    keywords: [
+        'engineering',
+        'blog',
+        'backend',
+        'systems',
+        'software development',
+        'programming',
+        'web development',
+        'Apar Agarwal',
+    ],
     authors: [{ name: 'Apar Agarwal', url: 'https://aparagarwal.tech' }],
     creator: 'Apar Agarwal',
     openGraph: {
@@ -26,13 +51,15 @@ export const metadata: Metadata = {
         locale: 'en_US',
         url: baseUrl,
         title: 'Apar Agarwal | Engineering Blog',
-        description: 'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first.',
+        description:
+            'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first.',
         siteName: 'Apar Agarwal Blog',
     },
     twitter: {
         card: 'summary_large_image',
         title: 'Apar Agarwal | Engineering Blog',
-        description: 'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first.',
+        description:
+            'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first.',
         creator: '@aparagarwal',
     },
     robots: {
@@ -49,13 +76,9 @@ export const metadata: Metadata = {
     alternates: {
         canonical: baseUrl,
     },
-}
+};
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
@@ -74,10 +97,11 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body className={`${poppins.variable} ${borel.variable} ${comfortaa.variable} ${gochiHand.variable} ${outfit.variable}`}>
+            <body
+                className={`${poppins.variable} ${borel.variable} ${comfortaa.variable} ${gochiHand.variable} ${outfit.variable}`}
+            >
                 <RootLayoutClient>{children}</RootLayoutClient>
             </body>
         </html>
-    )
+    );
 }
-

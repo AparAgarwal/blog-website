@@ -1,5 +1,4 @@
-
-import PostForm from '@/components/PostForm'
+import PostForm from '@/components/PostForm';
 
 export default function NewPostPage() {
     return (
@@ -7,5 +6,5 @@ export default function NewPostPage() {
             <h1 style={{ marginBottom: '40px' }}>Create New Post</h1>
             <PostForm />
         </div>
-    )
+    );
 }

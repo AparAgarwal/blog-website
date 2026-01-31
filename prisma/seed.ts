@@ -1,34 +1,33 @@
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-    const adminEmail = process.env.ADMIN_EMAIL
-    const adminPassword = process.env.ADMIN_PASSWORD
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
     // Require both email and password to be set
     if (!adminEmail || !adminPassword) {
-        console.error('ERROR: ADMIN_EMAIL and ADMIN_PASSWORD must be set in environment variables')
-        console.error('Please set these in your .env file before running seed.')
-        process.exit(1)
+        console.error('ERROR: ADMIN_EMAIL and ADMIN_PASSWORD must be set in environment variables');
+        console.error('Please set these in your .env file before running seed.');
+        process.exit(1);
     }
 
     // Validate password strength
     if (adminPassword.length < 12) {
-        console.error('ERROR: ADMIN_PASSWORD must be at least 12 characters long')
-        process.exit(1)
+        console.error('ERROR: ADMIN_PASSWORD must be at least 12 characters long');
+        process.exit(1);
     }
 
     // Check for common weak passwords
-    const weakPasswords = ['password', '123456', 'admin', 'qwerty', 'letmein']
-    if (weakPasswords.some(weak => adminPassword.toLowerCase().includes(weak))) {
-        console.error('ERROR: ADMIN_PASSWORD is too weak. Please use a strong, unique password.')
-        process.exit(1)
+    const weakPasswords = ['password', '123456', 'admin', 'qwerty', 'letmein'];
+    if (weakPasswords.some((weak) => adminPassword.toLowerCase().includes(weak))) {
+        console.error('ERROR: ADMIN_PASSWORD is too weak. Please use a strong, unique password.');
+        process.exit(1);
     }
 
-    const hashedPassword = await bcrypt.hash(adminPassword, 10)
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     await prisma.admin.upsert({
         where: { email: adminEmail },
         update: { password: hashedPassword },
@@ -36,16 +35,15 @@ async function main() {
             email: adminEmail,
             password: hashedPassword,
         },
-    })
-    console.log(`✅ Admin user ${adminEmail} seeded successfully.`)
-    console.log('⚠️  Keep your credentials secure!')
-
-
+    });
+    console.log(`✅ Admin user ${adminEmail} seeded successfully.`);
+    console.log('⚠️  Keep your credentials secure!');
 
     const posts = [
         {
-            title: "Designing Rate Limiting for a Node.js API",
-            excerpt: "A deep dive into implementing distributed rate limiting using Redis and sliding window counters to protect your backend.",
+            title: 'Designing Rate Limiting for a Node.js API',
+            excerpt:
+                'A deep dive into implementing distributed rate limiting using Redis and sliding window counters to protect your backend.',
             content: `
 ## The Thundering Herd
 
@@ -79,14 +77,15 @@ const luaScript = \`
 
 When running multiple Node.js instances, local memory stores won't cut it. Redis provides the atomic operations needed to synchronize counters across your cluster.
             `,
-            slug: "rate-limiting-node-api",
-            tags: "Node.js, Redis, System Design",
+            slug: 'rate-limiting-node-api',
+            tags: 'Node.js, Redis, System Design',
             published: true,
-            createdAt: new Date("2026-01-29"),
+            createdAt: new Date('2026-01-29'),
         },
         {
-            title: "Why My First Cache Invalidation Strategy Failed",
-            excerpt: "Cache invalidation is one of the two hardest problems in CS. Here is how I messed it up and what I learned about event-driven invalidation.",
+            title: 'Why My First Cache Invalidation Strategy Failed',
+            excerpt:
+                'Cache invalidation is one of the two hardest problems in CS. Here is how I messed it up and what I learned about event-driven invalidation.',
             content: `
 ## The Stale Data Nightmare
 
@@ -109,14 +108,15 @@ await pubsub.publish('user-updated', { id });
 
 This ensures that *immediately* after a write, the next read will fetch fresh data from the DB.
             `,
-            slug: "cache-invalidation-mistakes",
-            tags: "Caching, Architecture, Backend",
+            slug: 'cache-invalidation-mistakes',
+            tags: 'Caching, Architecture, Backend',
             published: true,
-            createdAt: new Date("2026-01-28"),
+            createdAt: new Date('2026-01-28'),
         },
         {
-            title: "Notes on Consistent Hashing",
-            excerpt: "Understanding how to distribute data across a changing set of servers without remapping the entire world.",
+            title: 'Notes on Consistent Hashing',
+            excerpt:
+                'Understanding how to distribute data across a changing set of servers without remapping the entire world.',
             content: `
 ## The Rebalancing Act
 
@@ -138,14 +138,15 @@ To prevent hotspots where one server handles too much of the ring, we use **Virt
 
 This is the backbone of systems like DynamoDB and Cassandra.
             `,
-            slug: "consistent-hashing-notes",
-            tags: "Algorithms, Distributed Systems",
+            slug: 'consistent-hashing-notes',
+            tags: 'Algorithms, Distributed Systems',
             published: true,
-            createdAt: new Date("2026-01-25"),
+            createdAt: new Date('2026-01-25'),
         },
         {
-            title: "Rust Web Tooling: The New Standard",
-            excerpt: "Why the JavaScript ecosystem is rewriting everything in Rust, and why it matters for your build times.",
+            title: 'Rust Web Tooling: The New Standard',
+            excerpt:
+                'Why the JavaScript ecosystem is rewriting everything in Rust, and why it matters for your build times.',
             content: `
 ## Speed Matters
 
@@ -159,14 +160,15 @@ Turbopack: 2s
 
 The difference isn't just nice-to-have; it changes how you develop. Instant feedback loops keep you in the flow state.
             `,
-            slug: "rust-web-tooling",
-            tags: "Rust, Tooling, Performance",
+            slug: 'rust-web-tooling',
+            tags: 'Rust, Tooling, Performance',
             published: true,
-            createdAt: new Date("2026-01-20"),
+            createdAt: new Date('2026-01-20'),
         },
         {
-            title: "Rethinking Data Fetching with React Server Components",
-            excerpt: "Server Components are the biggest shift in React since Hooks. Here's why they matter and how they change the mental model of building apps.",
+            title: 'Rethinking Data Fetching with React Server Components',
+            excerpt:
+                "Server Components are the biggest shift in React since Hooks. Here's why they matter and how they change the mental model of building apps.",
             content: `
 ## The Waterfall Problem
 
@@ -185,14 +187,15 @@ export default async function Page() {
 
 No more \`useEffect\`, no more loading spinners for simple data. It just renders.
             `,
-            slug: "react-server-components",
-            tags: "React, Next.js, Frontend",
+            slug: 'react-server-components',
+            tags: 'React, Next.js, Frontend',
             published: true,
-            createdAt: new Date("2026-01-18"),
+            createdAt: new Date('2026-01-18'),
         },
         {
-            title: "Database Indexing 101: Optimizing Your Queries",
-            excerpt: "A slow query is often just a missing index away from being instant. Learn the basics of B-Trees and how to analyze query plans.",
+            title: 'Database Indexing 101: Optimizing Your Queries',
+            excerpt:
+                'A slow query is often just a missing index away from being instant. Learn the basics of B-Trees and how to analyze query plans.',
             content: `
 ## Anatomy of an Index
 
@@ -209,14 +212,15 @@ ON Post(published, createdAt DESC);
 
 Always check your \`EXPLAIN ANALYZE\` output!
             `,
-            slug: "database-indexing-101",
-            tags: "SQL, Database, Performance",
+            slug: 'database-indexing-101',
+            tags: 'SQL, Database, Performance',
             published: true,
-            createdAt: new Date("2026-01-15"),
+            createdAt: new Date('2026-01-15'),
         },
         {
-            title: "Why We Moved to a Monorepo",
-            excerpt: "Managing multiple repositories became a nightmare of version mismatches and duplicated code. Here is how a monorepo saved our sanity.",
+            title: 'Why We Moved to a Monorepo',
+            excerpt:
+                'Managing multiple repositories became a nightmare of version mismatches and duplicated code. Here is how a monorepo saved our sanity.',
             content: `
 ## The Dependency Hell
 
@@ -230,14 +234,15 @@ We switched to a monorepo managed by TurboRepo. Now, changes to shared libraries
 
 We reduced our CI times by 60% using caching and parallel execution.
             `,
-            slug: "moving-to-monorepo",
-            tags: "DevOps, Architecture, Productivity",
+            slug: 'moving-to-monorepo',
+            tags: 'DevOps, Architecture, Productivity',
             published: true,
-            createdAt: new Date("2026-01-10"),
+            createdAt: new Date('2026-01-10'),
         },
         {
             title: "It's Always DNS: A Debugging Story",
-            excerpt: "A mysterious outage that wasn't a code bug, but a misunderstood TTL record. A cautionary tale about the internet's phonebook.",
+            excerpt:
+                "A mysterious outage that wasn't a code bug, but a misunderstood TTL record. A cautionary tale about the internet's phonebook.",
             content: `
 ## The Outage
 
@@ -251,28 +256,28 @@ Some ISPs were caching the old IP address for 24 hours.
 
 **Lesson learned:** Always lower your TTL to 60 seconds at least 48 hours before a major migration.
             `,
-            slug: "always-dns",
-            tags: "Networking, Debugging, Post-mortem",
+            slug: 'always-dns',
+            tags: 'Networking, Debugging, Post-mortem',
             published: true,
-            createdAt: new Date("2026-01-05"),
-        }
-    ]
+            createdAt: new Date('2026-01-05'),
+        },
+    ];
 
     for (const post of posts) {
         await prisma.post.upsert({
             where: { slug: post.slug },
             update: post,
             create: post,
-        })
+        });
     }
 }
 
 main()
     .then(async () => {
-        await prisma.$disconnect()
+        await prisma.$disconnect();
     })
     .catch(async (e) => {
-        console.error(e)
-        await prisma.$disconnect()
-        process.exit(1)
-    })
+        console.error(e);
+        await prisma.$disconnect();
+        process.exit(1);
+    });

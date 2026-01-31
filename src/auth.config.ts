@@ -1,4 +1,3 @@
-
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '@/lib/db';
@@ -10,8 +9,8 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: 'Credentials',
             credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" }
+                email: { label: 'Email', type: 'email' },
+                password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
@@ -23,19 +22,18 @@ export const authOptions: NextAuthOptions = {
                 if (!allowed) {
                     const remainingTime = await getRateLimitInfo(credentials.email);
                     const minutes = remainingTime ? Math.ceil(remainingTime / 60) : 10;
-                    throw new Error(`Too many login attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`);
+                    throw new Error(
+                        `Too many login attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`
+                    );
                 }
 
                 const user = await prisma.admin.findUnique({
-                    where: { email: credentials.email }
+                    where: { email: credentials.email },
                 });
 
                 // Timing attack prevention: always compare password
                 const hashedPassword = user?.password || '$2a$10$abcdefghijklmnopqrstuvwxyzABCDE'; // Dummy hash
-                const isPasswordValid = await bcrypt.compare(
-                    credentials.password,
-                    hashedPassword
-                );
+                const isPasswordValid = await bcrypt.compare(credentials.password, hashedPassword);
 
                 if (!user || !isPasswordValid) {
                     throw new Error('Invalid email or password');
@@ -46,8 +44,8 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     name: 'Admin',
                 };
-            }
-        })
+            },
+        }),
     ],
     pages: {
         signIn: '/login',
@@ -69,10 +67,9 @@ export const authOptions: NextAuthOptions = {
                 token.email = user.email;
             }
             return token;
-        }
+        },
     },
     secret: process.env.NEXTAUTH_SECRET,
     // @ts-ignore - trustHost is valid but may not be in type definitions
     trustHost: true, // Required for Vercel deployments
 };
-

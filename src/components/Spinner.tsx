@@ -15,12 +15,14 @@ export default function Spinner({ size = 16, color = 'white', borderWidth = 2 }:
                     border: `${borderWidth}px solid rgba(255,255,255,0.3)`,
                     borderTopColor: color,
                     borderRadius: '50%',
-                    animation: 'spin 0.6s linear infinite'
+                    animation: 'spin 0.6s linear infinite',
                 }}
             ></span>
             <style jsx>{`
                 @keyframes spin {
-                    to { transform: rotate(360deg); }
+                    to {
+                        transform: rotate(360deg);
+                    }
                 }
             `}</style>
         </>

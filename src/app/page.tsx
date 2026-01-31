@@ -25,9 +25,9 @@ async function getHomePageData() {
         });
 
         // Featured topics from the first 3 posts
-        const featuredTopics = posts.slice(0, 3).map(p => ({
+        const featuredTopics = posts.slice(0, 3).map((p) => ({
             text: p.title,
-            href: `/posts/${p.slug}`
+            href: `/posts/${p.slug}`,
         }));
 
         return { posts, featuredTopics };
@@ -50,7 +50,9 @@ export default async function Home() {
                     showToggle={false}
                     footerContent={
                         <div className="view-all-container">
-                            <Link href="/archive" className="view-all-btn">View All Posts</Link>
+                            <Link href="/archive" className="view-all-btn">
+                                View All Posts
+                            </Link>
                         </div>
                     }
                 />

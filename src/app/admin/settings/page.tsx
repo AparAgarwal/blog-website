@@ -1,62 +1,62 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { signOut } from 'next-auth/react'
-import { toast } from 'sonner'
-import { changePassword } from '@/app/actions'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+import { toast } from 'sonner';
+import { changePassword } from '@/app/actions';
 
 export default function SettingsPage() {
-    const [currentPassword, setCurrentPassword] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [loading, setLoading] = useState(false)
-    const router = useRouter()
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+        e.preventDefault();
 
         // Client-side validation
         if (newPassword.length < 12) {
-            toast.error('New password must be at least 12 characters long')
-            return
+            toast.error('New password must be at least 12 characters long');
+            return;
         }
 
         if (newPassword !== confirmPassword) {
-            toast.error('New passwords do not match')
-            return
+            toast.error('New passwords do not match');
+            return;
         }
 
         if (currentPassword === newPassword) {
-            toast.error('New password must be different from current password')
-            return
+            toast.error('New password must be different from current password');
+            return;
         }
 
-        setLoading(true)
+        setLoading(true);
 
         try {
-            const formData = new FormData()
-            formData.append('currentPassword', currentPassword)
-            formData.append('newPassword', newPassword)
+            const formData = new FormData();
+            formData.append('currentPassword', currentPassword);
+            formData.append('newPassword', newPassword);
 
-            const result = await changePassword(null, formData)
+            const result = await changePassword(null, formData);
 
             if (result.success) {
-                toast.success(result.message || 'Password changed successfully. Please login again.')
+                toast.success(result.message || 'Password changed successfully. Please login again.');
 
                 // Sign out and redirect to login
                 setTimeout(async () => {
-                    await signOut({ callbackUrl: '/login' })
-                }, 1500)
+                    await signOut({ callbackUrl: '/login' });
+                }, 1500);
             } else {
-                toast.error(result.message || 'Failed to change password')
-                setLoading(false)
+                toast.error(result.message || 'Failed to change password');
+                setLoading(false);
             }
         } catch (_error) {
-            toast.error('An error occurred while changing password')
-            setLoading(false)
+            toast.error('An error occurred while changing password');
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="container" style={{ paddingTop: 40, paddingBottom: 80, maxWidth: '600px' }}>
@@ -83,15 +83,13 @@ export default function SettingsPage() {
                                 border: '1px solid var(--border-color)',
                                 background: 'var(--bg-secondary)',
                                 color: 'var(--text-primary)',
-                                fontSize: '16px'
+                                fontSize: '16px',
                             }}
                         />
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-                            New Password
-                        </label>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>New Password</label>
                         <input
                             type="password"
                             value={newPassword}
@@ -106,7 +104,7 @@ export default function SettingsPage() {
                                 border: '1px solid var(--border-color)',
                                 background: 'var(--bg-secondary)',
                                 color: 'var(--text-primary)',
-                                fontSize: '16px'
+                                fontSize: '16px',
                             }}
                         />
                         <p style={{ fontSize: '14px', color: 'var(--text-tertiary)', marginTop: '4px' }}>
@@ -131,7 +129,7 @@ export default function SettingsPage() {
                                 border: '1px solid var(--border-color)',
                                 background: 'var(--bg-secondary)',
                                 color: 'var(--text-primary)',
-                                fontSize: '16px'
+                                fontSize: '16px',
                             }}
                         />
                     </div>
@@ -143,7 +141,7 @@ export default function SettingsPage() {
                             className="view-all-btn"
                             style={{
                                 cursor: loading ? 'not-allowed' : 'pointer',
-                                opacity: loading ? 0.6 : 1
+                                opacity: loading ? 0.6 : 1,
                             }}
                         >
                             {loading ? 'Changing...' : 'Change Password'}
@@ -159,7 +157,7 @@ export default function SettingsPage() {
                                 background: 'var(--bg-secondary)',
                                 color: 'var(--text-primary)',
                                 cursor: loading ? 'not-allowed' : 'pointer',
-                                opacity: loading ? 0.6 : 1
+                                opacity: loading ? 0.6 : 1,
                             }}
                         >
                             Cancel
@@ -167,20 +165,24 @@ export default function SettingsPage() {
                     </div>
                 </form>
 
-                <div style={{
-                    marginTop: '30px',
-                    paddingTop: '20px',
-                    borderTop: '1px solid var(--border-color)'
-                }}>
+                <div
+                    style={{
+                        marginTop: '30px',
+                        paddingTop: '20px',
+                        borderTop: '1px solid var(--border-color)',
+                    }}
+                >
                     <p style={{ fontSize: '14px', color: 'var(--text-tertiary)', marginBottom: '12px' }}>
                         <strong>Password Requirements:</strong>
                     </p>
-                    <ul style={{
-                        fontSize: '14px',
-                        color: 'var(--text-tertiary)',
-                        paddingLeft: '20px',
-                        lineHeight: '1.6'
-                    }}>
+                    <ul
+                        style={{
+                            fontSize: '14px',
+                            color: 'var(--text-tertiary)',
+                            paddingLeft: '20px',
+                            lineHeight: '1.6',
+                        }}
+                    >
                         <li>At least 12 characters long</li>
                         <li>Different from your current password</li>
                         <li>Mix of uppercase, lowercase, numbers, and symbols (recommended)</li>
@@ -189,5 +191,5 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

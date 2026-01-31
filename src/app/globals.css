@@ -67,7 +67,7 @@ html {
     --btn-radius: 8px;
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
     --bg-primary: #0a0a0a;
     --bg-secondary: #1a1a1a;
     --text-primary: #f5f5f5;
@@ -150,7 +150,9 @@ body {
     width: 100vw;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     display: flex;
     flex-direction: column;
     overflow-x: clip;
@@ -252,7 +254,9 @@ nav .nav-links a:hover {
 
 .theme-toggle svg {
     position: absolute;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
     color: var(--text-primary);
 }
 
@@ -266,12 +270,12 @@ nav .nav-links a:hover {
     transform: rotate(180deg);
 }
 
-[data-theme="dark"] .theme-toggle .sun-icon {
+[data-theme='dark'] .theme-toggle .sun-icon {
     opacity: 0;
     transform: rotate(180deg);
 }
 
-[data-theme="dark"] .theme-toggle .moon-icon {
+[data-theme='dark'] .theme-toggle .moon-icon {
     opacity: 1;
     transform: rotate(0deg);
 }
@@ -364,37 +368,49 @@ nav .nav-links a:hover {
 
 .shard-1 {
     clip-path: polygon(0% 0%, 30% 0%, 35% 30%, 10% 40%, 0% 30%);
-    animation: fadeInBreak 0.1s ease forwards, shardExplode1 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation:
+        fadeInBreak 0.1s ease forwards,
+        shardExplode1 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
     animation-delay: 1.4s, 1.5s;
 }
 
 .shard-2 {
     clip-path: polygon(30% 0%, 70% 0%, 65% 35%, 35% 30%);
-    animation: fadeInBreak 0.1s ease forwards, shardExplode2 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation:
+        fadeInBreak 0.1s ease forwards,
+        shardExplode2 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
     animation-delay: 1.4s, 1.5s;
 }
 
 .shard-3 {
     clip-path: polygon(70% 0%, 100% 0%, 100% 40%, 75% 35%, 65% 35%);
-    animation: fadeInBreak 0.1s ease forwards, shardExplode3 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation:
+        fadeInBreak 0.1s ease forwards,
+        shardExplode3 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
     animation-delay: 1.4s, 1.5s;
 }
 
 .shard-4 {
     clip-path: polygon(0% 30%, 10% 40%, 35% 30%, 40% 60%, 20% 100%, 0% 100%);
-    animation: fadeInBreak 0.1s ease forwards, shardExplode4 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation:
+        fadeInBreak 0.1s ease forwards,
+        shardExplode4 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
     animation-delay: 1.4s, 1.5s;
 }
 
 .shard-5 {
     clip-path: polygon(35% 30%, 65% 35%, 75% 35%, 100% 40%, 100% 100%, 60% 100%, 40% 60%);
-    animation: fadeInBreak 0.1s ease forwards, shardExplode5 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation:
+        fadeInBreak 0.1s ease forwards,
+        shardExplode5 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
     animation-delay: 1.4s, 1.5s;
 }
 
 .shard-6 {
     clip-path: polygon(40% 60%, 60% 100%, 20% 100%);
-    animation: fadeInBreak 0.1s ease forwards, shardExplode6 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+    animation:
+        fadeInBreak 0.1s ease forwards,
+        shardExplode6 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
     animation-delay: 1.4s, 1.5s;
 }
 
@@ -440,7 +456,9 @@ nav .nav-links a:hover {
     display: flex;
     align-items: baseline;
     gap: 16px;
-    transition: transform 0.2s ease, color 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
     padding: 8px 0;
     opacity: 0;
 }
@@ -472,7 +490,7 @@ nav .nav-links a:hover {
 }
 
 .hero-sequence .topic-item:nth-child(3) {
-    animation-delay: 2.0s;
+    animation-delay: 2s;
 }
 
 .topic-item:hover {
@@ -590,7 +608,7 @@ nav .nav-links a:hover {
     transform: scaleX(1);
 }
 
-[data-theme="dark"] .post-card:hover {
+[data-theme='dark'] .post-card:hover {
     box-shadow: 0 12px 24px rgba(255, 255, 255, 0.05);
 }
 
@@ -672,7 +690,7 @@ nav .nav-links a:hover {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="dark"] .view-toggle-btn.active {
+[data-theme='dark'] .view-toggle-btn.active {
     background-color: #333;
     color: #fff;
 }
@@ -854,7 +872,7 @@ footer {
     margin-top: auto;
     font-family: 'Outfit', sans-serif;
     color: var(--text-tertiary);
-    font-size: .9rem;
+    font-size: 0.9rem;
 }
 
 .view-all-container {
@@ -885,7 +903,7 @@ footer {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="dark"] .view-all-btn:hover {
+[data-theme='dark'] .view-all-btn:hover {
     box-shadow: 0 8px 16px rgba(255, 255, 255, 0.05);
 }
 
@@ -1057,12 +1075,12 @@ footer {
     color: #764ba2;
 }
 
-[data-theme="dark"] .post-content pre {
+[data-theme='dark'] .post-content pre {
     background: #000;
     border-color: #333;
 }
 
-[data-theme="dark"] .post-content p code {
+[data-theme='dark'] .post-content p code {
     color: #ffa7c4;
     background: rgba(255, 255, 255, 0.1);
 }
@@ -1257,7 +1275,9 @@ footer {
     pointer-events: none;
     z-index: 9999;
     transform: translate(-50%, -50%);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
 }
 
 .cursor-dot.hidden {
@@ -1295,7 +1315,6 @@ footer {
 
 /* Mobile screens */
 @media (max-width: 768px) {
-
     /* Header & Navigation */
     nav {
         padding: 0 10px;

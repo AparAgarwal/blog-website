@@ -1,16 +1,12 @@
 'use client';
 
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import CursorDot from '@/components/CursorDot'
-import ToastProvider from '@/components/ToastProvider'
-import { useState, useEffect } from 'react'
+import Link from 'next/link';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import CursorDot from '@/components/CursorDot';
+import ToastProvider from '@/components/ToastProvider';
+import { useState, useEffect } from 'react';
 
-export default function RootLayoutClient({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+export default function RootLayoutClient({ children }: { children: React.ReactNode }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -30,7 +26,9 @@ export default function RootLayoutClient({
 
     return (
         <>
-            <a href="#main-content" className="skip-link">Skip to main content</a>
+            <a href="#main-content" className="skip-link">
+                Skip to main content
+            </a>
             <header>
                 <nav aria-label="Main navigation">
                     <div className="logo">
@@ -52,13 +50,29 @@ export default function RootLayoutClient({
                     </button>
 
                     <div id="navigation-menu" className={`nav-links ${menuOpen ? 'active' : ''}`} role="menu">
-                        <Link href="/" onClick={closeMenu} role="menuitem">Home</Link>
-                        <Link href="/archive" onClick={closeMenu} role="menuitem">Archive</Link>
-                        <Link href="https://aparagarwal.tech" target="_blank" rel="noopener noreferrer" onClick={closeMenu} role="menuitem">Portfolio</Link>
+                        <Link href="/" onClick={closeMenu} role="menuitem">
+                            Home
+                        </Link>
+                        <Link href="/archive" onClick={closeMenu} role="menuitem">
+                            Archive
+                        </Link>
+                        <Link
+                            href="https://aparagarwal.tech"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={closeMenu}
+                            role="menuitem"
+                        >
+                            Portfolio
+                        </Link>
                         <ThemeToggle />
                     </div>
 
-                    <div className={`menu-overlay ${menuOpen ? 'active' : ''}`} onClick={closeMenu} aria-hidden="true"></div>
+                    <div
+                        className={`menu-overlay ${menuOpen ? 'active' : ''}`}
+                        onClick={closeMenu}
+                        aria-hidden="true"
+                    ></div>
                 </nav>
             </header>
             <hr className="divider" aria-hidden="true" />
@@ -70,5 +84,5 @@ export default function RootLayoutClient({
             <CursorDot />
             <ToastProvider />
         </>
-    )
+    );
 }

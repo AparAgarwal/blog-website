@@ -24,7 +24,7 @@ export async function generateStaticParams() {
 }
 
 async function getPost(slug: string) {
-    const post = await prisma.post.findUnique({ 
+    const post = await prisma.post.findUnique({
         where: { slug },
         // Only fetch what we need
         select: {
@@ -36,7 +36,7 @@ async function getPost(slug: string) {
             createdAt: true,
             updatedAt: true,
             tags: true,
-        }
+        },
     });
     return post;
 }
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title: post.title,
         description,
-        keywords: post.tags ? post.tags.split(',').map(t => t.trim()) : [],
+        keywords: post.tags ? post.tags.split(',').map((t) => t.trim()) : [],
         authors: [{ name: 'Apar Agarwal' }],
         openGraph: {
             type: 'article',
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             publishedTime,
             modifiedTime,
             authors: ['Apar Agarwal'],
-            tags: post.tags ? post.tags.split(',').map(t => t.trim()) : [],
+            tags: post.tags ? post.tags.split(',').map((t) => t.trim()) : [],
         },
         twitter: {
             card: 'summary_large_image',
@@ -109,22 +109,28 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
     return (
         <article className="post-page">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
             <header className="post-header">
                 <div className="post-meta">
                     <time className="post-date" dateTime={post.createdAt.toISOString()}>
-                        {post.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {post.createdAt.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                        })}
                     </time>
                 </div>
                 <h1 className="post-title">{post.title}</h1>
                 {post.tags && post.tags.length > 0 && (
                     <div className="post-page-tags" role="list" aria-label="Post tags">
-                        {post.tags.split(',').filter(tag => tag.trim()).map((tag: string) => (
-                            <span key={tag} className="tag" role="listitem">{tag.trim()}</span>
-                        ))}
+                        {post.tags
+                            .split(',')
+                            .filter((tag) => tag.trim())
+                            .map((tag: string) => (
+                                <span key={tag} className="tag" role="listitem">
+                                    {tag.trim()}
+                                </span>
+                            ))}
                     </div>
                 )}
             </header>
@@ -134,11 +140,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     options={{
                         mdxOptions: {
                             remarkPlugins: [remarkGfm],
-                            rehypePlugins: [rehypeHighlight]
-                        }
+                            rehypePlugins: [rehypeHighlight],
+                        },
                     }}
                     components={{
-                        pre: CodeBlock
+                        pre: CodeBlock,
                     }}
                 />
             </div>
