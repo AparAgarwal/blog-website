@@ -145,7 +145,7 @@ html {
    Body & Main Layout
    ============================================ */
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Outfit', sans-serif;
     min-height: 100vh;
     width: 100vw;
     background-color: var(--bg-primary);
@@ -713,8 +713,9 @@ nav .nav-links a:hover {
 }
 
 .archive-subtitle {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 18px;
+    letter-spacing: normal;
     color: var(--text-secondary);
     margin: 0;
     max-width: 600px;
@@ -791,7 +792,6 @@ nav .nav-links a:hover {
     font-size: 15px;
     color: var(--text-secondary);
     max-width: 800px;
-    margin-top: 8px;
     margin-bottom: 0;
 }
 
@@ -826,7 +826,7 @@ nav .nav-links a:hover {
 }
 
 .post-excerpt {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 14px;
     line-height: 1.6;
     color: var(--text-secondary);
@@ -970,7 +970,7 @@ footer {
    Markdown Content Styling
    ============================================ */
 .post-content {
-    font-family: 'Georgia', 'Cambria', serif;
+    font-family: 'Georgia', serif;
     font-size: clamp(16px, 2vw, 20px);
     line-height: 1.8;
     color: var(--text-primary);

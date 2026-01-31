@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Borel, Comfortaa, Gochi_Hand, Outfit, Poppins } from 'next/font/google';
+import { Borel, Comfortaa, Outfit } from 'next/font/google';
 import './globals.css';
 import RootLayoutClient from './layout-client';
 
@@ -10,17 +10,10 @@ const comfortaa = Comfortaa({
     variable: '--font-comfortaa',
     display: 'swap',
 });
-const gochiHand = Gochi_Hand({ subsets: ['latin'], weight: '400', variable: '--font-gochi-hand', display: 'swap' });
 const outfit = Outfit({
     subsets: ['latin'],
     weight: ['200', '300', '400', '500', '600', '700', '800'],
     variable: '--font-outfit',
-    display: 'swap',
-});
-const poppins = Poppins({
-    subsets: ['latin'],
-    weight: ['300', '400', '500', '600', '700'],
-    variable: '--font-poppins',
     display: 'swap',
 });
 
@@ -82,8 +75,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
+                <link rel="icon" href="/favicon/favicon-16x16.png" sizes="16x16" type="image/png" />
+                <link rel="icon" href="/favicon/favicon-32x32.png" sizes="32x32" type="image/png" />
+                <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" sizes="180x180" />
+                <link rel="manifest" href="/favicon/site.webmanifest" />
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
@@ -97,9 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     }}
                 />
             </head>
-            <body
-                className={`${poppins.variable} ${borel.variable} ${comfortaa.variable} ${gochiHand.variable} ${outfit.variable}`}
-            >
+            <body className={`${borel.variable} ${comfortaa.variable} ${outfit.variable}`}>
                 <RootLayoutClient>{children}</RootLayoutClient>
             </body>
         </html>
