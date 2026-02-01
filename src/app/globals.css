@@ -19,6 +19,34 @@ html {
 }
 
 /* ============================================
+   Scrollbar Styles - Modern & Minimal
+   ============================================ */
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-tertiary) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* ============================================
    Accessibility - Skip Link
    ============================================ */
 .skip-link {
