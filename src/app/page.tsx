@@ -24,11 +24,30 @@ async function getHomePageData() {
             take: 6, // Only 6 posts for home page
         });
 
-        // Featured topics from the first 3 posts
-        const featuredTopics = posts.slice(0, 3).map((p) => ({
-            text: p.title,
-            href: `/posts/${p.slug}`,
-        }));
+        // Find featured post by checking for "featured" tag
+        const featuredPost = posts.find((p) => p.tags.toLowerCase().includes('featured'));
+
+        // Build featured topics with featured post always first
+        const featuredTopics = [];
+
+        if (featuredPost) {
+            featuredTopics.push({
+                text: featuredPost.title,
+                href: `/posts/${featuredPost.slug}`,
+            });
+        }
+
+        // Add other recent posts to fill remaining slots (up to 3 total)
+        const remainingSlots = 3 - featuredTopics.length;
+        posts
+            .filter((p) => p.id !== featuredPost?.id)
+            .slice(0, remainingSlots)
+            .forEach((p) => {
+                featuredTopics.push({
+                    text: p.title,
+                    href: `/posts/${p.slug}`,
+                });
+            });
 
         return { posts, featuredTopics };
     } catch (_error) {
