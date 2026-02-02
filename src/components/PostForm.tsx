@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 import { Post } from '@prisma/client';
+import './PostForm.css';
 
 export default function PostForm({ post }: { post?: Post }) {
     const [slug, setSlug] = useState(post?.slug || '');
@@ -26,7 +28,6 @@ export default function PostForm({ post }: { post?: Post }) {
     };
 
     const handleAction = async (formData: FormData) => {
-        // Ensure content state is passed if textarea wasn't updated manually (though it should be)
         let result;
         if (post) {
             result = await updatePost(null, formData);
@@ -53,7 +54,6 @@ export default function PostForm({ post }: { post?: Post }) {
 
         setContent(newText);
 
-        // Update cursor position
         setTimeout(() => {
             textarea.focus();
             textarea.setSelectionRange(start + before.length, end + before.length);
@@ -64,125 +64,122 @@ export default function PostForm({ post }: { post?: Post }) {
         <form
             action={handleAction}
             className="post-form"
-            style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
         >
             {post && <input type="hidden" name="id" value={post.id} />}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Title</label>
-                    <input
-                        name="title"
-                        defaultValue={post?.title}
-                        onChange={(e) => generateSlug(e.target.value)}
-                        required
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            borderRadius: '6px',
-                            border: '1px solid var(--border-color)',
-                            background: 'var(--bg-secondary)',
-                            color: 'var(--text-primary)',
-                            fontSize: '16px',
-                        }}
-                    />
-                </div>
-                <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Slug</label>
-                    <input
-                        name="slug"
-                        value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
-                        required
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            borderRadius: '6px',
-                            border: '1px solid var(--border-color)',
-                            background: 'var(--bg-secondary)',
-                            color: 'var(--text-primary)',
-                            fontSize: '16px',
-                        }}
-                    />
-                </div>
-            </div>
-
-            <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Excerpt</label>
-                <textarea
-                    name="excerpt"
-                    defaultValue={post?.excerpt}
-                    required
-                    rows={3}
-                    style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '6px',
-                        border: '1px solid var(--border-color)',
-                        background: 'var(--bg-secondary)',
-                        color: 'var(--text-primary)',
-                        fontSize: '16px',
-                        fontFamily: 'inherit',
-                    }}
-                />
-            </div>
-
-            <div
-                className="editor-container"
-                style={{ border: '1px solid var(--border-color)', borderRadius: '8px', overflow: 'hidden' }}
-            >
-                <div
-                    className="editor-header"
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '12px 16px',
-                        background: 'var(--bg-secondary)',
-                        borderBottom: '1px solid var(--border-color)',
-                    }}
-                >
-                    <div className="tabs" style={{ display: 'flex', gap: '16px' }}>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('write')}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontWeight: activeTab === 'write' ? 600 : 400,
-                                color: activeTab === 'write' ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                            }}
-                        >
-                            Write
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('preview')}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontWeight: activeTab === 'preview' ? 600 : 400,
-                                color: activeTab === 'preview' ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                            }}
-                        >
-                            Preview
-                        </button>
+            {/* Top row: Title, Slug, Excerpt, Tags, Published */}
+            <div className="top-section">
+                <div className="top-row">
+                    <div className="input-group">
+                        <label className="label">Title</label>
+                        <input
+                            name="title"
+                            defaultValue={post?.title}
+                            onChange={(e) => generateSlug(e.target.value)}
+                            required
+                            className="input"
+                        />
                     </div>
-                    {activeTab === 'write' && (
-                        <div className="toolbar" style={{ display: 'flex', gap: '8px' }}>
+                    <div className="input-group">
+                        <label className="label">Slug</label>
+                        <input
+                            name="slug"
+                            value={slug}
+                            onChange={(e) => setSlug(e.target.value)}
+                            required
+                            className="input"
+                        />
+                    </div>
+                </div>
+
+                <div className="input-group">
+                    <label className="label">Excerpt</label>
+                    <textarea
+                        name="excerpt"
+                        defaultValue={post?.excerpt}
+                        required
+                        rows={2}
+                        className="textarea"
+                    />
+                </div>
+
+                <div className="input-group">
+                    <label className="label">
+                        Tags (comma separated)
+                    </label>
+                    <input
+                        name="tags"
+                        defaultValue={post?.tags}
+                        className="input"
+                    />
+                </div>
+
+                <div className="checkbox-container">
+                    <input
+                        type="checkbox"
+                        name="published"
+                        id="published"
+                        defaultChecked={post?.published}
+                        className="checkbox"
+                    />
+                    <label htmlFor="published" className="checkbox-label">
+                        Published
+                    </label>
+                </div>
+            </div>
+
+            {/* Mobile-only toggle button - positioned above containers */}
+            <button
+                type="button"
+                className="mobile-toggle-button"
+                onClick={() => setActiveTab(activeTab === 'write' ? 'preview' : 'write')}
+                title={activeTab === 'write' ? 'Switch to Preview' : 'Switch to Write'}
+            >
+                {activeTab === 'write' ? (
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                ) : (
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                )}
+            </button>
+
+            {/* Responsive: 2 columns on desktop, 1 column on mobile */}
+            <div className="editor-preview-wrapper">
+                {/* Editor container */}
+                <div
+                    className={`editor-container ${activeTab === 'write' ? 'mobile-active' : ''}`}
+                >
+                    <div className="editor-header">
+                        <div className="header-title">Editor</div>
+                        <div className="toolbar">
                             <button
                                 type="button"
                                 onClick={() => insertText('**', '**')}
                                 title="Bold"
-                                style={{
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    border: '1px solid var(--border-color)',
-                                    background: 'var(--bg-primary)',
-                                    cursor: 'pointer',
-                                }}
+                                className="toolbar-btn"
                             >
                                 B
                             </button>
@@ -190,13 +187,7 @@ export default function PostForm({ post }: { post?: Post }) {
                                 type="button"
                                 onClick={() => insertText('*', '*')}
                                 title="Italic"
-                                style={{
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    border: '1px solid var(--border-color)',
-                                    background: 'var(--bg-primary)',
-                                    cursor: 'pointer',
-                                }}
+                                className="toolbar-btn"
                             >
                                 I
                             </button>
@@ -204,13 +195,7 @@ export default function PostForm({ post }: { post?: Post }) {
                                 type="button"
                                 onClick={() => insertText('`', '`')}
                                 title="Code"
-                                style={{
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    border: '1px solid var(--border-color)',
-                                    background: 'var(--bg-primary)',
-                                    cursor: 'pointer',
-                                }}
+                                className="toolbar-btn"
                             >
                                 {'<>'}
                             </button>
@@ -218,87 +203,38 @@ export default function PostForm({ post }: { post?: Post }) {
                                 type="button"
                                 onClick={() => insertText('[', '](url)')}
                                 title="Link"
-                                style={{
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    border: '1px solid var(--border-color)',
-                                    background: 'var(--bg-primary)',
-                                    cursor: 'pointer',
-                                }}
+                                className="toolbar-btn"
                             >
                                 Link
                             </button>
                         </div>
-                    )}
+                    </div>
+                    <textarea
+                        name="content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                        placeholder="Write your markdown here..."
+                        className="editor-textarea"
+                    />
                 </div>
 
-                <div className="editor-content" style={{ minHeight: '400px', position: 'relative' }}>
-                    {activeTab === 'write' ? (
-                        <textarea
-                            name="content"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            required
-                            placeholder="Write your markdown here..."
-                            style={{
-                                width: '100%',
-                                height: '400px',
-                                padding: '16px',
-                                border: 'none',
-                                resize: 'vertical',
-                                background: 'var(--bg-primary)',
-                                color: 'var(--text-primary)',
-                                fontFamily: 'monospace',
-                                fontSize: '15px',
-                                outline: 'none',
-                            }}
-                        />
-                    ) : (
-                        <div
-                            className="markdown-preview post-content"
-                            style={{
-                                padding: '24px',
-                                height: '400px',
-                                overflowY: 'auto',
-                                background: 'var(--bg-primary)',
-                            }}
-                        >
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-                        </div>
-                    )}
+                {/* Preview container */}
+                <div
+                    className={`preview-container ${activeTab === 'preview' ? 'mobile-active' : ''}`}
+                >
+                    <div className="preview-header">
+                        <div className="header-title">Live Preview</div>
+                    </div>
+                    <div className="markdown-preview post-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                            {content}
+                        </ReactMarkdown>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Tags (comma separated)</label>
-                <input
-                    name="tags"
-                    defaultValue={post?.tags}
-                    style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '6px',
-                        border: '1px solid var(--border-color)',
-                        background: 'var(--bg-secondary)',
-                        color: 'var(--text-primary)',
-                    }}
-                />
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <input
-                    type="checkbox"
-                    name="published"
-                    id="published"
-                    defaultChecked={post?.published}
-                    style={{ width: '20px', height: '20px' }}
-                />
-                <label htmlFor="published" style={{ fontWeight: 500 }}>
-                    Published
-                </label>
-            </div>
-
-            <button type="submit" className="view-all-btn" style={{ alignSelf: 'flex-start', cursor: 'pointer' }}>
+            <button type="submit" className="view-all-btn submit-btn">
                 {post ? 'Update Post' : 'Create Post'}
             </button>
         </form>

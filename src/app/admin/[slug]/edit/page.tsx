@@ -16,7 +16,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ slug:
     }
 
     return (
-        <div className="container" style={{ paddingTop: 40, paddingBottom: 80, maxWidth: '900px' }}>
+        <div className="container" style={{ paddingTop: 40, paddingBottom: 80 }}>
             <h1 style={{ marginBottom: '40px' }}>Edit Post: {post.title}</h1>
             <PostForm post={post} />
         </div>
