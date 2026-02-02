@@ -8,7 +8,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { Post } from '@prisma/client';
-import './PostForm.css';
 
 export default function PostForm({ post }: { post?: Post }) {
     const [slug, setSlug] = useState(post?.slug || '');
@@ -61,10 +60,7 @@ export default function PostForm({ post }: { post?: Post }) {
     };
 
     return (
-        <form
-            action={handleAction}
-            className="post-form"
-        >
+        <form action={handleAction} className="post-form">
             {post && <input type="hidden" name="id" value={post.id} />}
 
             {/* Top row: Title, Slug, Excerpt, Tags, Published */}
@@ -94,24 +90,12 @@ export default function PostForm({ post }: { post?: Post }) {
 
                 <div className="input-group">
                     <label className="label">Excerpt</label>
-                    <textarea
-                        name="excerpt"
-                        defaultValue={post?.excerpt}
-                        required
-                        rows={2}
-                        className="textarea"
-                    />
+                    <textarea name="excerpt" defaultValue={post?.excerpt} required rows={2} className="textarea" />
                 </div>
 
                 <div className="input-group">
-                    <label className="label">
-                        Tags (comma separated)
-                    </label>
-                    <input
-                        name="tags"
-                        defaultValue={post?.tags}
-                        className="input"
-                    />
+                    <label className="label">Tags (comma separated)</label>
+                    <input name="tags" defaultValue={post?.tags} className="input" />
                 </div>
 
                 <div className="checkbox-container">
@@ -169,9 +153,7 @@ export default function PostForm({ post }: { post?: Post }) {
             {/* Responsive: 2 columns on desktop, 1 column on mobile */}
             <div className="editor-preview-wrapper">
                 {/* Editor container */}
-                <div
-                    className={`editor-container ${activeTab === 'write' ? 'mobile-active' : ''}`}
-                >
+                <div className={`editor-container ${activeTab === 'write' ? 'mobile-active' : ''}`}>
                     <div className="editor-header">
                         <div className="header-title">Editor</div>
                         <div className="toolbar">
@@ -220,9 +202,7 @@ export default function PostForm({ post }: { post?: Post }) {
                 </div>
 
                 {/* Preview container */}
-                <div
-                    className={`preview-container ${activeTab === 'preview' ? 'mobile-active' : ''}`}
-                >
+                <div className={`preview-container ${activeTab === 'preview' ? 'mobile-active' : ''}`}>
                     <div className="preview-header">
                         <div className="header-title">Live Preview</div>
                     </div>

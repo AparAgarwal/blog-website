@@ -1,0 +1,133 @@
+/* ============================================
+   Animation Keyframes & Effects
+   ============================================ */
+
+/* Core Animations */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInBreak {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOutBreak {
+    to {
+        opacity: 0;
+    }
+}
+
+/* Shard Explosion Animations (Breaking Text Effect) */
+@keyframes shardExplode1 {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    100% {
+        transform: translate(-3px, -2px) rotate(-2deg);
+        opacity: 1;
+    }
+}
+
+@keyframes shardExplode2 {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    100% {
+        transform: translate(1px, -4px) rotate(1deg);
+        opacity: 1;
+    }
+}
+
+@keyframes shardExplode3 {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    100% {
+        transform: translate(4px, -2px) rotate(3deg);
+        opacity: 1;
+    }
+}
+
+@keyframes shardExplode4 {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    100% {
+        transform: translate(-2px, 3px) rotate(-1deg);
+        opacity: 1;
+    }
+}
+
+@keyframes shardExplode5 {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    100% {
+        transform: translate(3px, 4px) rotate(2deg);
+        opacity: 1;
+    }
+}
+
+@keyframes shardExplode6 {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+
+    100% {
+        transform: translate(0, 6px) rotate(-5deg);
+        color: var(--text-secondary);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   Custom Cursor
+   ============================================ */
+.cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--text-tertiary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.cursor-dot.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+}

@@ -1,0 +1,61 @@
+/* ============================================
+   Button Styles
+   ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: var(--btn-radius);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: 1px solid transparent;
+    gap: 8px;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--hover-bg);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #ef4444;
+    border-color: rgba(255, 0, 0, 0.2);
+}
+
+.btn-danger:hover {
+    background-color: rgba(255, 0, 0, 0.15);
+    transform: translateY(-1px);
+}

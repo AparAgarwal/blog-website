@@ -1,0 +1,72 @@
+/* ============================================
+   Code Block Styles
+   ============================================ */
+.code-block-wrapper {
+    position: relative;
+    margin: 24px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: #1e1e1e;
+    display: grid;
+    grid-template-columns: 100%;
+}
+
+.copy-button-container {
+    grid-area: 1 / 1;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    justify-self: end;
+    align-self: start;
+    height: auto;
+    display: flex;
+    pointer-events: none;
+    max-height: fit-content;
+}
+
+.copy-button {
+    margin: 16px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition:
+        all 0.3s ease,
+        opacity 0.3s ease;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+}
+
+.code-block-wrapper:hover .copy-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+.copy-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.code-block-pre {
+    grid-area: 1 / 1;
+    padding: 16px;
+    padding-top: 16px;
+    overflow-x: auto;
+    background-color: transparent;
+    color: #e5e7eb;
+    border-radius: 8px;
+    margin: 0 !important;
+    border: none;
+}

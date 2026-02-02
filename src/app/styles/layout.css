@@ -1,0 +1,82 @@
+/* ============================================
+   Body & Main Layout
+   ============================================ */
+body {
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    padding: 0 40px;
+}
+
+/* ============================================
+   Header & Navigation
+   ============================================ */
+header {
+    height: 64px;
+    padding: 20px;
+}
+
+.divider {
+    margin: 0 10px;
+    border: none;
+    border-top: 2px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+nav {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 20px;
+}
+
+nav .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Borel', sans-serif;
+    font-size: 28px;
+}
+
+nav .logo .logo-text {
+    display: inline-block;
+    transform: translateY(6px);
+    color: var(--text-primary);
+}
+
+nav .nav-links {
+    font-family: 'Comfortaa', sans-serif;
+}
+
+nav .nav-links a {
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: transform 0.3s ease;
+}
+
+nav .nav-links a:hover {
+    transform: scale(1.1);
+}

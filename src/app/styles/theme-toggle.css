@@ -1,0 +1,61 @@
+/* ============================================
+   Theme Toggle
+   ============================================ */
+.theme-toggle {
+    background: none;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    position: relative;
+}
+
+.theme-toggle:hover {
+    background-color: var(--hover-bg);
+    transform: scale(1.05);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+.theme-toggle svg {
+    position: absolute;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+    color: var(--text-primary);
+}
+
+/* Default (dark mode): show moon icon */
+.theme-toggle .sun-icon {
+    opacity: 0;
+    transform: rotate(180deg);
+}
+
+.theme-toggle .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+/* Light mode: show sun icon */
+[data-theme='light'] .theme-toggle .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+[data-theme='light'] .theme-toggle .moon-icon {
+    opacity: 0;
+    transform: rotate(180deg);
+}

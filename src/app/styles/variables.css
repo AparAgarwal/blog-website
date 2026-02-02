@@ -1,0 +1,41 @@
+/* ============================================
+   CSS Variables - Theme Configuration
+   ============================================ */
+/* Default theme: Dark */
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #f5f5f5;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #999;
+    --border-color: #333;
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --title-light: #d0d0d0;
+    --title-bold: #ffffff;
+    --btn-radius: 8px;
+}
+
+[data-theme='light'] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #171717;
+    --text-secondary: #404040;
+    --text-tertiary: #525252;
+    --border-color: #e5e5e5;
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --title-light: #2d2d2d;
+    --title-bold: #0a0a0a;
+}
+
+/* Legacy support for data-theme='dark' */
+[data-theme='dark'] {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #f5f5f5;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #999;
+    --border-color: #333;
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --title-light: #d0d0d0;
+    --title-bold: #ffffff;
+}

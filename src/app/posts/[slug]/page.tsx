@@ -145,6 +145,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     }}
                     components={{
                         pre: CodeBlock,
+                        table: (props: React.HTMLAttributes<HTMLTableElement>) => (
+                            <div className="table-wrapper">
+                                <table {...props} />
+                            </div>
+                        ),
                     }}
                 />
             </div>
