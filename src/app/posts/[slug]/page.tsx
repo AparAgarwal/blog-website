@@ -97,8 +97,8 @@ async function getPostData(slug: string) {
 }
 
 // Generate metadata for each post
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-    const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
     const data = await getPostData(slug);
 
     if (!data || !data.post || !data.post.published) {
@@ -139,8 +139,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-    const { slug } = params;
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const data = await getPostData(slug);
 
     if (!data || !data.post || !data.post.published) {
