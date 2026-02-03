@@ -17,6 +17,10 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tags      String // Comma separated tags or JSON
+  
+  nextPostId String? @unique
+  nextPost   Post?   @relation("NextPost", fields: [nextPostId], references: [id])
+  prevPost   Post?   @relation("NextPost")
 
   @@index([published, createdAt(sort: Desc)])
 }
