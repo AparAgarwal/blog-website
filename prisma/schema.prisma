@@ -22,11 +22,11 @@ model Post {
   prevNavConfig String   @default("default") // default, none, home, custom
   
   nextPostId String?
-  nextPost   Post?   @relation("NextPost", fields: [nextPostId], references: [id])
+  nextPost   Post?   @relation("NextPost", fields: [nextPostId], references: [id], onDelete: SetNull)
   incomingNextPost Post[] @relation("NextPost")
 
   prevPostId String?
-  prevPost   Post?   @relation("PrevPost", fields: [prevPostId], references: [id])
+  prevPost   Post?   @relation("PrevPost", fields: [prevPostId], references: [id], onDelete: SetNull)
   incomingPrevPost Post[] @relation("PrevPost")
 
   @@index([published, createdAt(sort: Desc)])
