@@ -271,3 +271,21 @@
         display: none;
     }
 }
+
+@media (max-width: 600px) {
+    .post-navigation-footer {
+        padding-top: 20px;
+    }
+
+    .post-nav-grid {
+        gap: 16px;
+    }
+
+    .nav-link {
+        padding: 10px 0;
+    }
+
+    .nav-title-wrapper::after {
+        bottom: -5px;
+    }
+}

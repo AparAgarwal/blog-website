@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import type { ComponentProps } from 'react';
 import prisma from '@/lib/db';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
@@ -23,10 +25,9 @@ export async function generateStaticParams() {
     }));
 }
 
-async function getPost(slug: string) {
+async function getPostData(slug: string) {
     const post = await prisma.post.findUnique({
         where: { slug },
-        // Only fetch what we need
         select: {
             id: true,
             slug: true,
@@ -36,22 +37,77 @@ async function getPost(slug: string) {
             createdAt: true,
             updatedAt: true,
             tags: true,
+            nextPost: {
+                select: {
+                    slug: true,
+                    title: true,
+                    published: true,
+                },
+            },
         },
     });
-    return post;
+
+    if (!post) return null;
+
+    let nextPost = post.nextPost;
+    let prevPost = null;
+
+    if (nextPost && !nextPost.published) {
+        nextPost = null;
+    }
+
+    // If no custom next post, find the next chronological one
+    if (!nextPost) {
+        nextPost = await prisma.post.findFirst({
+            where: {
+                published: true,
+                createdAt: {
+                    gt: post.createdAt,
+                },
+            },
+            orderBy: {
+                createdAt: 'asc',
+            },
+            select: {
+                slug: true,
+                title: true,
+                published: true,
+            },
+        });
+    }
+
+    // Find previous post
+    prevPost = await prisma.post.findFirst({
+        where: {
+            published: true,
+            createdAt: {
+                lt: post.createdAt,
+            },
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        select: {
+            slug: true,
+            title: true,
+        },
+    });
+
+    return { post, nextPost, prevPost };
 }
 
 // Generate metadata for each post
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-    const { slug } = await params;
-    const post = await getPost(slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+    const { slug } = params;
+    const data = await getPostData(slug);
 
-    if (!post || !post.published) {
+    if (!data || !data.post || !data.post.published) {
         return {
             title: 'Post Not Found',
         };
     }
 
+    const { post } = data;
     const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
     const publishedTime = post.createdAt.toISOString();
     const modifiedTime = post.updatedAt.toISOString();
@@ -83,13 +139,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
 }
 
-export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
-    const post = await getPost(slug);
+export default async function PostPage({ params }: { params: { slug: string } }) {
+    const { slug } = params;
+    const data = await getPostData(slug);
 
-    if (!post || !post.published) {
+    if (!data || !data.post || !data.post.published) {
         notFound();
     }
+
+    const { post, nextPost, prevPost } = data;
 
     // Generate JSON-LD structured data
     const jsonLd = {
@@ -145,13 +203,41 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     }}
                     components={{
                         pre: CodeBlock,
-                        table: (props: React.HTMLAttributes<HTMLTableElement>) => (
+                        table: (props: ComponentProps<'table'>) => (
                             <div className="table-wrapper">
                                 <table {...props} />
                             </div>
                         ),
                     }}
                 />
+            </div>
+
+            <div className="post-navigation-footer">
+                <div className="post-nav-grid">
+                    {prevPost ? (
+                        <Link href={`/posts/${prevPost.slug}`} className="nav-link prev-link">
+                            <span className="nav-title-wrapper">
+                                <span className="nav-title">{prevPost.title}</span>
+                            </span>
+                        </Link>
+                    ) : (
+                        <Link href="/" className="nav-link prev-link">
+                            <span className="nav-title-wrapper">
+                                <span className="nav-title">Back to Home</span>
+                            </span>
+                        </Link>
+                    )}
+
+                    {nextPost ? (
+                        <Link href={`/posts/${nextPost.slug}`} className="nav-link next-link">
+                            <span className="nav-title-wrapper">
+                                <span className="nav-title">{nextPost.title}</span>
+                            </span>
+                        </Link>
+                    ) : (
+                        <div />
+                    )}
+                </div>
             </div>
         </article>
     );
