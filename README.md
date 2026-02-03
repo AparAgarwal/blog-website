@@ -77,13 +77,27 @@ A production-ready blog with secure admin dashboard, rich MDX content, and optim
 
 ## 🧰 Available Scripts
 
+### Development & Build
+
 - `npm run dev` - Start development server
 - `npm run build` - Build production bundle
 - `npm run start` - Start production server
+
+### Code Quality
+
 - `npm run lint` - Run ESLint checks
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
+
+### Database Management
+
+- `npx prisma generate` - Generate Prisma Client
+- `npx prisma db push` - Push schema to database
+- `npx prisma db seed` - Seed database with initial data
+- `npx prisma studio` - Open Prisma Studio (database GUI)
+- `npx tsx scripts/backup-db.ts` - Backup posts to JSON file
+- `npx tsx scripts/restore-db.ts` - Restore posts from JSON backup
 
 ## 📂 Project Structure
 
@@ -101,14 +115,21 @@ A production-ready blog with secure admin dashboard, rich MDX content, and optim
 │   │   ├── layout.tsx  # Root layout with metadata and font configuration
 │   │   └── layout-client.tsx  # Client-side layout with navigation
 │   ├── lib/
-│   │   └── db.ts       # Global PrismaClient instance
+│   │   ├── db.ts       # Global PrismaClient instance
+│   │   └── rate-limit.ts  # Rate limiting utility
 │   ├── components/     # Reusable UI components
 │   │   ├── PostList.tsx     # Post list with optional infinite scroll
+│   │   ├── PostForm.tsx     # Post creation/editing form
 │   │   ├── ThemeToggle.tsx  # Dark/light theme switcher
 │   │   ├── Spinner.tsx      # Loading spinner component
+│   │   ├── HeroSection.tsx  # Homepage hero section
+│   │   ├── CodeBlock.tsx    # Syntax-highlighted code blocks
 │   │   └── ...              # Other components
 │   ├── middleware.ts   # Authentication protection rules
 │   └── types/          # TypeScript type definitions
+├── scripts/
+│   ├── backup-db.ts    # Database backup script
+│   └── restore-db.ts   # Database restore script
 ├── public/             # Static assets
 ├── .prettierrc         # Prettier configuration
 ├── eslint.config.mjs   # ESLint configuration (flat config)
@@ -118,6 +139,55 @@ A production-ready blog with secure admin dashboard, rich MDX content, and optim
 ## 📝 Content Management
 
 Posts are stored in PostgreSQL and rendered with MDX for safe, rich content. Create, edit, and publish posts through the admin dashboard at `/admin`.
+
+### Data Backup & Restore
+
+The project includes built-in scripts for backing up and restoring your blog data:
+
+#### 📦 Backup Your Data
+
+Create a JSON backup of all posts to preserve your content:
+
+```bash
+npx tsx scripts/backup-db.ts
+```
+
+This will:
+
+- Export all posts to `prisma/seed-data.json`
+- Preserve post relationships (linked posts)
+- Output backup statistics (number of posts backed up)
+
+**When to use:**
+
+- Before major database migrations
+- Before deploying significant changes
+- As part of regular backup strategy
+- Before testing destructive operations
+
+#### 🔄 Restore Your Data
+
+Restore posts from your backup file:
+
+```bash
+npx tsx scripts/restore-db.ts
+```
+
+This will:
+
+- Clear all existing posts from the database
+- Import posts from `prisma/seed-data.json`
+- Restore post relationships and linked posts
+- Display restore progress and statistics
+
+**⚠️ Warning:** This operation will **delete all existing posts** before restoring. Make sure you have a current backup before running this command.
+
+**Use cases:**
+
+- Recovering from accidental data deletion
+- Migrating between databases
+- Restoring to a previous state
+- Setting up a development environment with production data
 
 ## 🔐 Security & Accessibility
 
