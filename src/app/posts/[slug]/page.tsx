@@ -37,7 +37,18 @@ async function getPostData(slug: string) {
             createdAt: true,
             updatedAt: true,
             tags: true,
+            nextPostId: true,
+            nextNavConfig: true,
+            prevPostId: true,
+            prevNavConfig: true,
             nextPost: {
+                select: {
+                    slug: true,
+                    title: true,
+                    published: true,
+                },
+            },
+            prevPost: {
                 select: {
                     slug: true,
                     title: true,
@@ -49,49 +60,29 @@ async function getPostData(slug: string) {
 
     if (!post) return null;
 
-    let nextPost = post.nextPost;
-    let prevPost = null;
+    // Helper function to get navigation post based on config
+    const getNavPost = async (config: string, customPost: typeof post.nextPost | null, direction: 'next' | 'prev') => {
+        if (config === 'none') return null;
+        if (config === 'home') return { slug: '/', title: 'Back to Homepage' };
+        if (config === 'custom' && customPost) {
+            return customPost.published ? customPost : null;
+        }
 
-    if (nextPost && !nextPost.published) {
-        nextPost = null;
-    }
-
-    // If no custom next post, find the next chronological one
-    if (!nextPost) {
-        nextPost = await prisma.post.findFirst({
+        // Default: Chronological
+        return await prisma.post.findFirst({
             where: {
                 published: true,
-                createdAt: {
-                    gt: post.createdAt,
-                },
+                createdAt: direction === 'next' ? { gt: post.createdAt } : { lt: post.createdAt },
             },
-            orderBy: {
-                createdAt: 'asc',
-            },
-            select: {
-                slug: true,
-                title: true,
-                published: true,
-            },
+            orderBy: { createdAt: direction === 'next' ? 'asc' : 'desc' },
+            select: { slug: true, title: true, published: true },
         });
-    }
+    };
 
-    // Find previous post
-    prevPost = await prisma.post.findFirst({
-        where: {
-            published: true,
-            createdAt: {
-                lt: post.createdAt,
-            },
-        },
-        orderBy: {
-            createdAt: 'desc',
-        },
-        select: {
-            slug: true,
-            title: true,
-        },
-    });
+    const [nextPost, prevPost] = await Promise.all([
+        getNavPost(post.nextNavConfig, post.nextPost, 'next'),
+        getNavPost(post.prevNavConfig, post.prevPost, 'prev'),
+    ]);
 
     return { post, nextPost, prevPost };
 }
@@ -215,21 +206,23 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <div className="post-navigation-footer">
                 <div className="post-nav-grid">
                     {prevPost ? (
-                        <Link href={`/posts/${prevPost.slug}`} className="nav-link prev-link">
+                        <Link
+                            href={prevPost.slug === '/' ? '/' : `/posts/${prevPost.slug}`}
+                            className="nav-link prev-link"
+                        >
                             <span className="nav-title-wrapper">
                                 <span className="nav-title">{prevPost.title}</span>
                             </span>
                         </Link>
                     ) : (
-                        <Link href="/" className="nav-link prev-link">
-                            <span className="nav-title-wrapper">
-                                <span className="nav-title">Back to Home</span>
-                            </span>
-                        </Link>
+                        <div />
                     )}
 
                     {nextPost ? (
-                        <Link href={`/posts/${nextPost.slug}`} className="nav-link next-link">
+                        <Link
+                            href={nextPost.slug === '/' ? '/' : `/posts/${nextPost.slug}`}
+                            className="nav-link next-link"
+                        >
                             <span className="nav-title-wrapper">
                                 <span className="nav-title">{nextPost.title}</span>
                             </span>

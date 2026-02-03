@@ -19,6 +19,10 @@ const PostSchema = z.object({
     content: z.string().min(1, 'Content is required').max(50000, 'Content is too long'),
     tags: z.string().max(200, 'Tags string is too long'),
     published: z.boolean(),
+    nextPostId: z.string().nullable().optional(),
+    prevPostId: z.string().nullable().optional(),
+    nextNavConfig: z.string().default('default'),
+    prevNavConfig: z.string().default('default'),
 });
 
 export async function authenticate(_prevState: string | undefined, _formData: FormData) {
@@ -43,6 +47,42 @@ export async function createPost(prevState: FormState | null, formData: FormData
     try {
         await checkAuth();
 
+        const rawNextId = formData.get('nextPostId') as string;
+        const rawPrevId = formData.get('prevPostId') as string;
+
+        let nextNavConfig = 'default';
+        let nextPostId = null;
+        let prevNavConfig = 'default';
+        let prevPostId = null;
+
+        // Determine Next Config
+        if (rawNextId === 'home') {
+            nextNavConfig = 'home';
+        } else if (rawNextId === 'none') {
+            nextNavConfig = 'none';
+        } else if (rawNextId && rawNextId !== '' && rawNextId !== 'default') {
+            nextNavConfig = 'custom';
+            nextPostId = rawNextId;
+        } else {
+            // Empty string or 'default' means use chronological
+            nextNavConfig = 'default';
+            nextPostId = null;
+        }
+
+        // Determine Prev Config
+        if (rawPrevId === 'home') {
+            prevNavConfig = 'home';
+        } else if (rawPrevId === 'none') {
+            prevNavConfig = 'none';
+        } else if (rawPrevId && rawPrevId !== '' && rawPrevId !== 'default') {
+            prevNavConfig = 'custom';
+            prevPostId = rawPrevId;
+        } else {
+            // Empty string or 'default' means use chronological
+            prevNavConfig = 'default';
+            prevPostId = null;
+        }
+
         const rawData = {
             title: formData.get('title') as string,
             slug: formData.get('slug') as string,
@@ -50,6 +90,10 @@ export async function createPost(prevState: FormState | null, formData: FormData
             content: formData.get('content') as string,
             tags: formData.get('tags') as string,
             published: formData.get('published') === 'on' || formData.get('published') === 'true',
+            nextPostId,
+            prevPostId,
+            nextNavConfig,
+            prevNavConfig,
         };
 
         const validatedData = PostSchema.parse(rawData);
@@ -84,6 +128,42 @@ export async function updatePost(prevState: FormState | null, formData: FormData
     try {
         await checkAuth();
 
+        const rawNextId = formData.get('nextPostId') as string;
+        const rawPrevId = formData.get('prevPostId') as string;
+
+        let nextNavConfig = 'default';
+        let nextPostId = null;
+        let prevNavConfig = 'default';
+        let prevPostId = null;
+
+        // Determine Next Config
+        if (rawNextId === 'home') {
+            nextNavConfig = 'home';
+        } else if (rawNextId === 'none') {
+            nextNavConfig = 'none';
+        } else if (rawNextId && rawNextId !== '' && rawNextId !== 'default') {
+            nextNavConfig = 'custom';
+            nextPostId = rawNextId;
+        } else {
+            // Empty string or 'default' means use chronological
+            nextNavConfig = 'default';
+            nextPostId = null;
+        }
+
+        // Determine Prev Config
+        if (rawPrevId === 'home') {
+            prevNavConfig = 'home';
+        } else if (rawPrevId === 'none') {
+            prevNavConfig = 'none';
+        } else if (rawPrevId && rawPrevId !== '' && rawPrevId !== 'default') {
+            prevNavConfig = 'custom';
+            prevPostId = rawPrevId;
+        } else {
+            // Empty string or 'default' means use chronological
+            prevNavConfig = 'default';
+            prevPostId = null;
+        }
+
         const rawData = {
             title: formData.get('title') as string,
             slug: formData.get('slug') as string,
@@ -91,6 +171,10 @@ export async function updatePost(prevState: FormState | null, formData: FormData
             content: formData.get('content') as string,
             tags: formData.get('tags') as string,
             published: formData.get('published') === 'on' || formData.get('published') === 'true',
+            nextPostId,
+            prevPostId,
+            nextNavConfig,
+            prevNavConfig,
         };
 
         const validatedData = PostSchema.parse(rawData);
@@ -146,6 +230,37 @@ export async function fetchPosts(page: number, limit: number) {
             orderBy: { createdAt: 'desc' },
             take: limit,
             skip: (page - 1) * limit,
+        });
+        return posts;
+    } catch (_error) {
+        return [];
+    }
+}
+
+// Get all posts for select dropdown with optional search and limit
+export async function getAllPostsForSelect(searchTerm?: string, limit?: number) {
+    try {
+        await checkAuth();
+
+        const whereClause = searchTerm
+            ? {
+                  title: {
+                      contains: searchTerm,
+                      mode: 'insensitive' as const,
+                  },
+              }
+            : {};
+
+        const posts = await prisma.post.findMany({
+            where: whereClause,
+            select: {
+                id: true,
+                title: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: limit,
         });
         return posts;
     } catch (_error) {
