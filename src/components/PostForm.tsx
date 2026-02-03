@@ -1,46 +1,104 @@
 'use client';
 
-import { createPost, updatePost } from '@/app/actions';
-import { useState } from 'react';
+import { createPost, updatePost, getAllPostsForSelect } from '@/app/actions';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { Post } from '@prisma/client';
+import SearchableSelect from './SearchableSelect';
+
+// Helper to get initial nav config value
+const getInitialNavValue = (config?: string, postId?: string | null) => {
+    if (config === 'home') return 'home';
+    if (config === 'none') return 'none';
+    if (config === 'custom' && postId) return postId;
+    return '';
+};
 
 export default function PostForm({ post }: { post?: Post }) {
     const [slug, setSlug] = useState(post?.slug || '');
     const [content, setContent] = useState(post?.content || '');
     const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [availablePosts, setAvailablePosts] = useState<{ id: string; title: string }[]>([]);
+    const [prevPostValue, setPrevPostValue] = useState(getInitialNavValue(post?.prevNavConfig, post?.prevPostId));
+    const [nextPostValue, setNextPostValue] = useState(getInitialNavValue(post?.nextNavConfig, post?.nextPostId));
     const router = useRouter();
 
-    const generateSlug = (title: string) => {
-        if (!post) {
-            setSlug(
-                title
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/(^-|-$)+/g, '')
-            );
-        }
-    };
+    // Load initial posts (limited)
+    useEffect(() => {
+        getAllPostsForSelect(undefined, 20).then((posts) => {
+            setAvailablePosts(posts.filter((p) => p.id !== post?.id));
+        });
+    }, [post?.id]);
 
-    const handleAction = async (formData: FormData) => {
-        let result;
-        if (post) {
-            result = await updatePost(null, formData);
-        } else {
-            result = await createPost(null, formData);
-        }
+    // Memoize nav options to avoid recreating on every render
+    const navOptions = useMemo(
+        () => [
+            { value: '', label: '-- Default (Chronological) --' },
+            { value: 'home', label: 'Home Page' },
+            { value: 'none', label: 'None (Hidden)' },
+            ...availablePosts.map((p) => ({
+                value: p.id,
+                label: p.title,
+                group: 'posts',
+            })),
+        ],
+        [availablePosts]
+    );
 
-        if (result?.success) {
-            toast.success(result.message);
-            router.push('/admin');
-        } else {
-            toast.error(result?.message || 'Something went wrong');
-        }
-    };
+    // Handle async search with useCallback to prevent recreation
+    const handlePostSearch = useCallback(
+        async (searchTerm: string) => {
+            const posts = await getAllPostsForSelect(searchTerm);
+            return posts
+                .filter((p) => p.id !== post?.id)
+                .map((p) => ({
+                    value: p.id,
+                    label: p.title,
+                    group: 'posts',
+                }));
+        },
+        [post?.id]
+    );
+
+    const generateSlug = useCallback(
+        (title: string) => {
+            if (!post) {
+                setSlug(
+                    title
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/(^-|-$)+/g, '')
+                );
+            }
+        },
+        [post]
+    );
+
+    const handleAction = useCallback(
+        async (formData: FormData) => {
+            setIsSubmitting(true);
+            try {
+                const result = post ? await updatePost(null, formData) : await createPost(null, formData);
+
+                if (result?.success) {
+                    toast.success(result.message);
+                    router.push('/admin');
+                } else {
+                    toast.error(result?.message || 'Something went wrong');
+                    setIsSubmitting(false);
+                }
+            } catch (_error) {
+                toast.error('An unexpected error occurred');
+                setIsSubmitting(false);
+            }
+        },
+        [post, router]
+    );
 
     const insertText = (before: string, after: string = '') => {
         const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement;
@@ -90,12 +148,42 @@ export default function PostForm({ post }: { post?: Post }) {
 
                 <div className="input-group">
                     <label className="label">Excerpt</label>
-                    <textarea name="excerpt" defaultValue={post?.excerpt} required rows={2} className="textarea" />
+                    <textarea
+                        name="excerpt"
+                        defaultValue={post?.excerpt}
+                        required
+                        className="textarea excerpt-textarea"
+                    />
                 </div>
 
                 <div className="input-group">
                     <label className="label">Tags (comma separated)</label>
                     <input name="tags" defaultValue={post?.tags} className="input" />
+                </div>
+
+                <div className="form-row">
+                    <div className="input-group">
+                        <label className="label">Previous Post (Optional custom link)</label>
+                        <SearchableSelect
+                            name="prevPostId"
+                            value={prevPostValue}
+                            onChange={setPrevPostValue}
+                            options={navOptions}
+                            placeholder="Select previous post"
+                            onSearch={handlePostSearch}
+                        />
+                    </div>
+                    <div className="input-group">
+                        <label className="label">Next Post (Optional custom link)</label>
+                        <SearchableSelect
+                            name="nextPostId"
+                            value={nextPostValue}
+                            onChange={setNextPostValue}
+                            options={navOptions}
+                            placeholder="Select next post"
+                            onSearch={handlePostSearch}
+                        />
+                    </div>
                 </div>
 
                 <div className="checkbox-container">
@@ -214,8 +302,27 @@ export default function PostForm({ post }: { post?: Post }) {
                 </div>
             </div>
 
-            <button type="submit" className="view-all-btn submit-btn">
-                {post ? 'Update Post' : 'Create Post'}
+            <button type="submit" className="view-all-btn submit-btn" disabled={isSubmitting}>
+                {isSubmitting ? (
+                    <>
+                        <svg
+                            className="submit-spinner"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                        >
+                            <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="32" />
+                        </svg>
+                        {post ? 'Updating...' : 'Creating...'}
+                    </>
+                ) : post ? (
+                    'Update Post'
+                ) : (
+                    'Create Post'
+                )}
             </button>
         </form>
     );
