@@ -18,9 +18,16 @@ model Post {
   updatedAt DateTime @updatedAt
   tags      String // Comma separated tags or JSON
   
-  nextPostId String? @unique
+  nextNavConfig String   @default("default") // default, none, home, custom
+  prevNavConfig String   @default("default") // default, none, home, custom
+  
+  nextPostId String?
   nextPost   Post?   @relation("NextPost", fields: [nextPostId], references: [id])
-  prevPost   Post?   @relation("NextPost")
+  incomingNextPost Post[] @relation("NextPost")
+
+  prevPostId String?
+  prevPost   Post?   @relation("PrevPost", fields: [prevPostId], references: [id])
+  incomingPrevPost Post[] @relation("PrevPost")
 
   @@index([published, createdAt(sort: Desc)])
 }
