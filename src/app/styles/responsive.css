@@ -223,50 +223,6 @@
         border-radius: 0;
     }
 
-    /* Breaking Text Shards - Reduce Movement */
-    @keyframes shardExplode1 {
-        100% {
-            transform: translate(-1px, -1px) rotate(-2deg);
-            opacity: 1;
-        }
-    }
-
-    @keyframes shardExplode2 {
-        100% {
-            transform: translate(0.5px, -1.5px) rotate(1deg);
-            opacity: 1;
-        }
-    }
-
-    @keyframes shardExplode3 {
-        100% {
-            transform: translate(1.5px, -1px) rotate(3deg);
-            opacity: 1;
-        }
-    }
-
-    @keyframes shardExplode4 {
-        100% {
-            transform: translate(-1px, 1px) rotate(-1deg);
-            opacity: 1;
-        }
-    }
-
-    @keyframes shardExplode5 {
-        100% {
-            transform: translate(1px, 1.5px) rotate(2deg);
-            opacity: 1;
-        }
-    }
-
-    @keyframes shardExplode6 {
-        100% {
-            transform: translate(0, 2px) rotate(-5deg);
-            color: var(--text-secondary);
-            opacity: 1;
-        }
-    }
-
     .cursor-dot {
         display: none;
     }

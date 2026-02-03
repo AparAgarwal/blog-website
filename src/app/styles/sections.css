@@ -275,3 +275,23 @@ footer {
 .view-all-btn:active {
     transform: translateY(0);
 }
+
+/* Submit Button Specific Styles */
+.submit-btn {
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.submit-spinner {
+    animation: spin 0.8s linear infinite;
+}

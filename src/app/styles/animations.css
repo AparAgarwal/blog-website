@@ -28,6 +28,55 @@
     }
 }
 
+/* Form Animations */
+@keyframes fadeInForm {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes checkIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+        stroke-dashoffset: 32;
+    }
+    50% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        transform: rotate(360deg);
+        stroke-dashoffset: -32;
+    }
+}
+
+/* Breaking Text Animations */
 @keyframes fadeInBreak {
     to {
         opacity: 1;
@@ -108,26 +157,48 @@
     }
 }
 
-/* ============================================
-   Custom Cursor
-   ============================================ */
-.cursor-dot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    background-color: var(--text-tertiary);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-}
+/* Mobile Responsive Shard Animations (Reduced Movement) */
+@media (max-width: 768px) {
+    @keyframes shardExplode1 {
+        100% {
+            transform: translate(-1px, -1px) rotate(-2deg);
+            opacity: 1;
+        }
+    }
 
-.cursor-dot.hidden {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
+    @keyframes shardExplode2 {
+        100% {
+            transform: translate(0.5px, -1.5px) rotate(1deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes shardExplode3 {
+        100% {
+            transform: translate(1.5px, -1px) rotate(3deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes shardExplode4 {
+        100% {
+            transform: translate(-1px, 1px) rotate(-1deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes shardExplode5 {
+        100% {
+            transform: translate(1px, 1.5px) rotate(2deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes shardExplode6 {
+        100% {
+            transform: translate(0, 2px) rotate(-5deg);
+            color: var(--text-secondary);
+            opacity: 1;
+        }
+    }
 }

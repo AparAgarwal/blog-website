@@ -80,3 +80,27 @@ nav .nav-links a {
 nav .nav-links a:hover {
     transform: scale(1.1);
 }
+
+/* ============================================
+   Custom Cursor
+   ============================================ */
+.cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--text-tertiary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.cursor-dot.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+}
