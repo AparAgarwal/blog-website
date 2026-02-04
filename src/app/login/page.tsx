@@ -3,7 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Spinner from '@/components/Spinner';
+import SubmitButton from '@/components/SubmitButton';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -105,28 +105,7 @@ export default function LoginPage() {
                             {error}
                         </div>
                     )}
-                    <button
-                        type="submit"
-                        className="view-all-btn"
-                        disabled={isLoading}
-                        style={{
-                            width: '100%',
-                            cursor: isLoading ? 'not-allowed' : 'pointer',
-                            opacity: isLoading ? 0.7 : 1,
-                            position: 'relative',
-                        }}
-                    >
-                        {isLoading ? (
-                            <span
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                            >
-                                <Spinner size={16} color="white" />
-                                Verifying...
-                            </span>
-                        ) : (
-                            'Sign In'
-                        )}
-                    </button>
+                    <SubmitButton label="Sign In" loadingLabel="Verifying..." loading={isLoading} />
                 </form>
             </div>
         </div>

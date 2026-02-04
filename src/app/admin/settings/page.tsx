@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { toast } from 'sonner';
 import { changePassword } from '@/app/actions';
+import SubmitButton from '@/components/SubmitButton';
 
 export default function SettingsPage() {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -135,17 +136,12 @@ export default function SettingsPage() {
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="view-all-btn"
-                            style={{
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                opacity: loading ? 0.6 : 1,
-                            }}
-                        >
-                            {loading ? 'Changing...' : 'Change Password'}
-                        </button>
+                        <SubmitButton
+                            label="Change Password"
+                            loadingLabel="Changing..."
+                            loading={loading}
+                            fullWidth={false}
+                        />
                         <button
                             type="button"
                             onClick={() => router.push('/admin')}

@@ -1,7 +1,7 @@
 'use client';
 
 import { createPost, updatePost, getAllPostsForSelect } from '@/app/actions';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { Post } from '@prisma/client';
 import SearchableSelect from './SearchableSelect';
+import SubmitButton from './SubmitButton';
 
 // Helper to get initial nav config value
 const getInitialNavValue = (config?: string, postId?: string | null) => {
@@ -22,7 +23,6 @@ export default function PostForm({ post }: { post?: Post }) {
     const [slug, setSlug] = useState(post?.slug || '');
     const [content, setContent] = useState(post?.content || '');
     const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [availablePosts, setAvailablePosts] = useState<{ id: string; title: string }[]>([]);
     const [prevPostValue, setPrevPostValue] = useState(getInitialNavValue(post?.prevNavConfig, post?.prevPostId));
     const [nextPostValue, setNextPostValue] = useState(getInitialNavValue(post?.nextNavConfig, post?.nextPostId));
@@ -79,26 +79,25 @@ export default function PostForm({ post }: { post?: Post }) {
         [post]
     );
 
-    const handleAction = useCallback(
-        async (formData: FormData) => {
-            setIsSubmitting(true);
-            try {
-                const result = post ? await updatePost(null, formData) : await createPost(null, formData);
+    const handleAction = async (_prevState: unknown, formData: FormData) => {
+        try {
+            const result = post ? await updatePost(null, formData) : await createPost(null, formData);
 
-                if (result?.success) {
-                    toast.success(result.message);
-                    router.push('/admin');
-                } else {
-                    toast.error(result?.message || 'Something went wrong');
-                    setIsSubmitting(false);
-                }
-            } catch (_error) {
-                toast.error('An unexpected error occurred');
-                setIsSubmitting(false);
+            if (result?.success) {
+                toast.success(result.message);
+                router.push('/admin');
+                return { success: true };
+            } else {
+                toast.error(result?.message || 'Something went wrong');
+                return { success: false };
             }
-        },
-        [post, router]
-    );
+        } catch (_error) {
+            toast.error('An unexpected error occurred');
+            return { success: false };
+        }
+    };
+
+    const [, formAction] = useActionState(handleAction, null);
 
     const insertText = (before: string, after: string = '') => {
         const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement;
@@ -118,7 +117,7 @@ export default function PostForm({ post }: { post?: Post }) {
     };
 
     return (
-        <form action={handleAction} className="post-form">
+        <form action={formAction} className="post-form">
             {post && <input type="hidden" name="id" value={post.id} />}
 
             {/* Top row: Title, Slug, Excerpt, Tags, Published */}
@@ -302,28 +301,10 @@ export default function PostForm({ post }: { post?: Post }) {
                 </div>
             </div>
 
-            <button type="submit" className="view-all-btn submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? (
-                    <>
-                        <svg
-                            className="submit-spinner"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                        >
-                            <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="32" />
-                        </svg>
-                        {post ? 'Updating...' : 'Creating...'}
-                    </>
-                ) : post ? (
-                    'Update Post'
-                ) : (
-                    'Create Post'
-                )}
-            </button>
+            <SubmitButton
+                label={post ? 'Update Post' : 'Create Post'}
+                loadingLabel={post ? 'Updating...' : 'Creating...'}
+            />
         </form>
     );
 }
