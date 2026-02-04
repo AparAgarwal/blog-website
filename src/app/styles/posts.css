@@ -483,6 +483,10 @@
     border-radius: 0 8px 8px 0;
 }
 
+.post-content blockquote p {
+    margin-bottom: 0;
+}
+
 .post-content pre {
     background: #121212;
     padding: clamp(16px, 2.5vw, 24px);
@@ -497,7 +501,7 @@
     font-size: clamp(0.85em, 1.5vw, 0.9em);
 }
 
-.post-content p code {
+.post-content code {
     background: var(--hover-bg);
     padding: 2px 6px;
     border-radius: 4px;
@@ -506,16 +510,16 @@
 }
 
 .post-content pre code {
-    color: #e0e0e0;
-    background: none;
-    padding: 0;
+    color: #e0e0e0 !important;
+    background: none !important;
+    padding: 0 !important;
 }
 
 .post-content img {
     max-width: 100%;
     border-radius: clamp(8px, 1.2vw, 12px);
     margin: clamp(28px, 4vw, 40px) 0;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 24px rgba(162, 117, 117, 0.1);
 }
 
 .post-content a {
@@ -523,6 +527,11 @@
     text-decoration: underline;
     text-underline-offset: 4px;
     transition: color 0.2s;
+}
+
+.post-content hr {
+    margin: clamp(28px, 4vw, 40px) 0;
+    border-color: var(--border-color);
 }
 
 /* Table Styles - Simple & Minimalistic */
@@ -603,7 +612,7 @@
     color: #e5e7eb;
 }
 
-[data-theme='light'] .post-content p code {
+[data-theme='light'] .post-content code {
     color: #c7254e;
     background: rgba(199, 37, 78, 0.12);
 }
