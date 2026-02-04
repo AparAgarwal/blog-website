@@ -10,12 +10,36 @@ export function ThemeToggle() {
         setMounted(true);
     }, []);
 
-    const toggleTheme = () => {
+    const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
         const html = document.documentElement;
-        const currentTheme = html.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        html.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+        const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+
+        // @ts-ignore - view transitions not fully typed yet
+        if (!document.startViewTransition) {
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            return;
+        }
+
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+        // Calculate animation origin point
+        const x = isMobile ? 0 : e.clientX;
+        const y = isMobile ? 0 : e.clientY;
+        const maxRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+        // @ts-ignore
+        const transition = document.startViewTransition(() => {
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        transition.ready.then(() => {
+            document.documentElement.animate(
+                { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`] },
+                { duration: 500, easing: 'ease-in-out', pseudoElement: '::view-transition-new(root)' }
+            );
+        });
     };
 
     if (!mounted) {

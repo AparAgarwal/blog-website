@@ -59,3 +59,9 @@
     opacity: 0;
     transform: rotate(180deg);
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
