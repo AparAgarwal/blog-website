@@ -1,13 +1,18 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function CursorDot() {
     const cursorDotRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
 
     useEffect(() => {
         const cursorDot = cursorDotRef.current;
         if (!cursorDot) return;
+
+        // Remove hidden class on route change or initial mount
+        cursorDot.classList.remove('hidden');
 
         let cursorX = 0,
             cursorY = 0;
@@ -57,8 +62,10 @@ export default function CursorDot() {
                 el.removeEventListener('mouseenter', onMouseEnter);
                 el.removeEventListener('mouseleave', onMouseLeave);
             });
+            // Remove hidden class on cleanup to ensure fresh state
+            cursorDot.classList.remove('hidden');
         };
-    }, []);
+    }, [pathname]);
 
     return <div ref={cursorDotRef} className="cursor-dot" data-cursor-dot></div>;
 }
