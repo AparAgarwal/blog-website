@@ -25,64 +25,67 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
     }, [menuOpen]);
 
     return (
-        <>
-            <a href="#main-content" className="skip-link">
-                Skip to main content
-            </a>
-            <header>
-                <nav aria-label="Main navigation">
-                    <div className="logo">
-                        <Link href="/" aria-label="Home - Apar Agarwal">
-                            <div className="logo-text">Apar Agarwal</div>
-                        </Link>
-                    </div>
+        <div className="app-wrapper">
+            <div className="background-pattern" aria-hidden="true" />
+            <div className="content-wrapper">
+                <a href="#main-content" className="skip-link">
+                    Skip to main content
+                </a>
+                <header>
+                    <nav aria-label="Main navigation">
+                        <div className="logo">
+                            <Link href="/" aria-label="Home - Apar Agarwal">
+                                <div className="logo-text">Apar Agarwal</div>
+                            </Link>
+                        </div>
 
-                    <button
-                        className={`hamburger ${menuOpen ? 'active' : ''}`}
-                        onClick={toggleMenu}
-                        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                        aria-expanded={menuOpen}
-                        aria-controls="navigation-menu"
-                    >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-
-                    <div id="navigation-menu" className={`nav-links ${menuOpen ? 'active' : ''}`} role="menu">
-                        <Link href="/" onClick={closeMenu} role="menuitem">
-                            Home
-                        </Link>
-                        <Link href="/archive" onClick={closeMenu} role="menuitem">
-                            Archive
-                        </Link>
-                        <Link
-                            href="https://aparagarwal.tech"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={closeMenu}
-                            role="menuitem"
+                        <button
+                            className={`hamburger ${menuOpen ? 'active' : ''}`}
+                            onClick={toggleMenu}
+                            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                            aria-expanded={menuOpen}
+                            aria-controls="navigation-menu"
                         >
-                            Portfolio
-                        </Link>
-                        <ThemeToggle />
-                    </div>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
 
-                    <div
-                        className={`menu-overlay ${menuOpen ? 'active' : ''}`}
-                        onClick={closeMenu}
-                        aria-hidden="true"
-                    ></div>
-                </nav>
-            </header>
-            <hr className="divider" aria-hidden="true" />
-            <main id="main-content">{children}</main>
-            <hr className="divider" aria-hidden="true" />
-            <footer role="contentinfo">
-                <p>&copy; {new Date().getFullYear()} Apar Agarwal. All rights reserved.</p>
-            </footer>
-            <CursorDot />
-            <ToastProvider />
-        </>
+                        <div id="navigation-menu" className={`nav-links ${menuOpen ? 'active' : ''}`} role="menu">
+                            <Link href="/" onClick={closeMenu} role="menuitem">
+                                Home
+                            </Link>
+                            <Link href="/archive" onClick={closeMenu} role="menuitem">
+                                Archive
+                            </Link>
+                            <Link
+                                href="https://aparagarwal.tech"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={closeMenu}
+                                role="menuitem"
+                            >
+                                Portfolio
+                            </Link>
+                            <ThemeToggle />
+                        </div>
+
+                        <div
+                            className={`menu-overlay ${menuOpen ? 'active' : ''}`}
+                            onClick={closeMenu}
+                            aria-hidden="true"
+                        ></div>
+                    </nav>
+                </header>
+                <hr className="divider" aria-hidden="true" />
+                <main id="main-content">{children}</main>
+                <hr className="divider" aria-hidden="true" />
+                <footer role="contentinfo">
+                    <p>&copy; {new Date().getFullYear()} Apar Agarwal. All rights reserved.</p>
+                </footer>
+                <CursorDot />
+                <ToastProvider />
+            </div>
+        </div>
     );
 }
