@@ -17,15 +17,24 @@ export const metadata: Metadata = {
 
 async function getHomePageData() {
     try {
-        // Single query to get both recent posts and featured topics
+        // Query featured post separately to ensure it's always found
+        const featuredPost = await prisma.post.findFirst({
+            where: {
+                published: true,
+                tags: {
+                    contains: 'Featured',
+                    mode: 'insensitive',
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+
+        // Get recent posts for home page
         const posts = await prisma.post.findMany({
             where: { published: true },
             orderBy: { createdAt: 'desc' },
-            take: 6, // Only 6 posts for home page
+            take: 6,
         });
-
-        // Find featured post by checking for "featured" tag
-        const featuredPost = posts.find((p) => p.tags.toLowerCase().includes('featured'));
 
         // Build featured topics with featured post always first
         const featuredTopics = [];
