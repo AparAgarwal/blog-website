@@ -205,11 +205,12 @@ export default function PostList({
                             aria-labelledby={`post-title-${post.id}`}
                         >
                             <div className="post-meta">
-                                <time className="post-date" dateTime={post.createdAt.toISOString()}>
+                                <time className="post-date" dateTime={new Date(post.createdAt).toISOString()}>
                                     {new Date(post.createdAt).toLocaleDateString('en-US', {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric',
+                                        timeZone: 'UTC',
                                     })}
                                 </time>
                             </div>
