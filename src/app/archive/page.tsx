@@ -9,11 +9,37 @@ const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
     title: 'Archive',
-    description: 'Browse all blog posts about engineering, backend systems, and software development.',
+    description:
+        'Browse all published blog posts about engineering, backend systems, and software development. Explore articles on system design, distributed systems, and software engineering best practices.',
+    keywords: [
+        'blog archive',
+        'engineering posts',
+        'backend systems',
+        'software development',
+        'system design',
+        'all articles',
+    ],
     openGraph: {
+        type: 'website',
         title: 'Archive | Apar Agarwal',
-        description: 'Browse all blog posts about engineering, backend systems, and software development.',
+        description: 'Browse all published blog posts about engineering, backend systems, and software development.',
         url: `${baseUrl}/archive`,
+        siteName: 'Apar Agarwal Blog',
+        images: [
+            {
+                url: `${baseUrl}/og-image.png`,
+                width: 1200,
+                height: 630,
+                alt: 'Apar Agarwal Blog Archive',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Archive | Apar Agarwal',
+        description: 'Browse all published blog posts about engineering, backend systems, and software development.',
+        creator: '@aparagarwal13',
+        images: [`${baseUrl}/og-image.png`],
     },
     alternates: {
         canonical: `${baseUrl}/archive`,

@@ -1,19 +1,58 @@
 {
-    "name": "Apar Agarwal Portfolio",
-    "short_name": "Portfolio",
+    "name": "Apar Agarwal | Engineering Blog",
+    "short_name": "Apar Agarwal",
+    "description": "Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first.",
+    "start_url": "/",
+    "scope": "/",
     "icons": [
+        {
+            "src": "./favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "./favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png",
+            "purpose": "any"
+        },
         {
             "src": "./android-chrome-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "./android-chrome-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "./apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
         }
     ],
     "theme_color": "#040404",
-    "background_color": "#040404",
-    "display": "standalone"
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "screenshots": [
+        {
+            "src": "./android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "./android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ]
 }

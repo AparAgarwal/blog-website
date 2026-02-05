@@ -10,6 +10,43 @@ export const revalidate = 300;
 const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
+    title: {
+        absolute: 'Apar Agarwal | Engineering Blog',
+    },
+    description:
+        'Engineering insights on backend development, distributed systems, and software architecture. Practical knowledge from real-world experience.',
+    keywords: [
+        'engineering',
+        'blog',
+        'backend',
+        'systems',
+        'software development',
+        'Apar Agarwal',
+        'system design',
+        'distributed systems',
+    ],
+    openGraph: {
+        type: 'website',
+        url: baseUrl,
+        title: 'Apar Agarwal | Engineering Blog',
+        description: 'Engineering insights on backend development, distributed systems, and software architecture.',
+        siteName: 'Apar Agarwal Blog',
+        images: [
+            {
+                url: `${baseUrl}/og-image.png`,
+                width: 1200,
+                height: 630,
+                alt: 'Apar Agarwal Engineering Blog',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Apar Agarwal | Engineering Blog',
+        description: 'Engineering insights on backend development, distributed systems, and software architecture.',
+        creator: '@aparagarwal13',
+        images: [`${baseUrl}/og-image.png`],
+    },
     alternates: {
         canonical: baseUrl,
     },

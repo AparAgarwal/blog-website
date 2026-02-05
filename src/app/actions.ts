@@ -209,21 +209,21 @@ export async function updatePost(prevState: FormState | null, formData: FormData
 export async function deletePost(id: string) {
     try {
         await checkAuth();
-        
+
         // Reset navigation configs for posts that reference this post
         await prisma.post.updateMany({
             where: { nextPostId: id },
-            data: { nextNavConfig: 'default' }
+            data: { nextNavConfig: 'default' },
         });
-        
+
         await prisma.post.updateMany({
             where: { prevPostId: id },
-            data: { prevNavConfig: 'default' }
+            data: { prevNavConfig: 'default' },
         });
-        
+
         // Delete the post (cascade will set foreign keys to null)
         await prisma.post.delete({ where: { id } });
-        
+
         revalidatePath('/admin');
         revalidatePath('/');
         revalidatePath('/archive');

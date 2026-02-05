@@ -46,7 +46,13 @@ export default async function AdminPage() {
                         <div>
                             <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{post.title}</h2>
                             <span className="post-meta">
-                                {post.published ? 'Published' : 'Draft'} • {post.createdAt.toLocaleDateString()}
+                                {post.published ? 'Published' : 'Draft'} •{' '}
+                                {post.createdAt.toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                    timeZone: 'UTC',
+                                })}
                             </span>
                         </div>
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

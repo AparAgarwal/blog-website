@@ -7,6 +7,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import CodeBlock from '@/components/CodeBlock';
+import { getBlogPostingSchema } from '@/lib/seo';
 
 // Revalidate every 10 minutes (600 seconds)
 export const revalidate = 600;
@@ -95,6 +96,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!data || !data.post || !data.post.published) {
         return {
             title: 'Post Not Found',
+            robots: {
+                index: false,
+            },
         };
     }
 
@@ -102,30 +106,41 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
     const publishedTime = post.createdAt.toISOString();
     const modifiedTime = post.updatedAt.toISOString();
+    const postUrl = `${baseUrl}/posts/${post.slug}`;
 
     return {
         title: post.title,
         description,
         keywords: post.tags ? post.tags.split(',').map((t) => t.trim()) : [],
-        authors: [{ name: 'Apar Agarwal' }],
+        authors: [{ name: 'Apar Agarwal', url: 'https://aparagarwal.tech' }],
+        creator: 'Apar Agarwal',
         openGraph: {
             type: 'article',
-            url: `${baseUrl}/posts/${post.slug}`,
+            url: postUrl,
             title: post.title,
             description,
             publishedTime,
             modifiedTime,
             authors: ['Apar Agarwal'],
             tags: post.tags ? post.tags.split(',').map((t) => t.trim()) : [],
+            images: [
+                {
+                    url: `${baseUrl}/og-image.png`,
+                    width: 1200,
+                    height: 630,
+                    alt: post.title,
+                },
+            ],
         },
         twitter: {
             card: 'summary_large_image',
             title: post.title,
             description,
-            creator: '@aparagarwal',
+            creator: '@aparagarwal13',
+            images: [`${baseUrl}/og-image.png`],
         },
         alternates: {
-            canonical: `${baseUrl}/posts/${post.slug}`,
+            canonical: postUrl,
         },
     };
 }
@@ -139,22 +154,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     }
 
     const { post, nextPost, prevPost } = data;
+    const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
 
-    // Generate JSON-LD structured data
-    const jsonLd = {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: post.title,
-        datePublished: post.createdAt.toISOString(),
-        dateModified: post.updatedAt.toISOString(),
-        author: {
-            '@type': 'Person',
-            name: 'Apar Agarwal',
-            url: 'https://aparagarwal.tech',
-        },
-        keywords: post.tags || '',
-        articleBody: post.content,
-    };
+    // Generate JSON-LD structured data using centralized schema
+    const jsonLd = getBlogPostingSchema(
+        post.title,
+        description,
+        post.content,
+        post.slug,
+        post.createdAt,
+        post.updatedAt,
+        post.tags || undefined
+    );
 
     return (
         <article className="post-page">
@@ -166,6 +177,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
+                            timeZone: 'UTC',
                         })}
                     </time>
                 </div>
