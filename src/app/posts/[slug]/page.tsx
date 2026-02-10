@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
+import { cache } from 'react';
 import type { ComponentProps } from 'react';
 import prisma from '@/lib/db';
 import { MDXRemote } from 'next-mdx-remote/rsc';
@@ -26,8 +27,9 @@ export async function generateStaticParams() {
     }));
 }
 
-async function getPostData(slug: string) {
-    const post = await prisma.post.findUnique({
+const getPostData = cache(async (slug: string) => {
+    // First attempt: exact match
+    let post = await prisma.post.findUnique({
         where: { slug },
         select: {
             id: true,
@@ -59,6 +61,46 @@ async function getPostData(slug: string) {
         },
     });
 
+    // Second attempt: case-insensitive fallback
+    if (!post) {
+        post = await prisma.post.findFirst({
+            where: {
+                slug: {
+                    equals: slug,
+                    mode: 'insensitive',
+                },
+            },
+            select: {
+                id: true,
+                slug: true,
+                title: true,
+                content: true,
+                published: true,
+                createdAt: true,
+                updatedAt: true,
+                tags: true,
+                nextPostId: true,
+                nextNavConfig: true,
+                prevPostId: true,
+                prevNavConfig: true,
+                nextPost: {
+                    select: {
+                        slug: true,
+                        title: true,
+                        published: true,
+                    },
+                },
+                prevPost: {
+                    select: {
+                        slug: true,
+                        title: true,
+                        published: true,
+                    },
+                },
+            },
+        });
+    }
+
     if (!post) return null;
 
     // Helper function to get navigation post based on config
@@ -86,7 +128,7 @@ async function getPostData(slug: string) {
     ]);
 
     return { post, nextPost, prevPost };
-}
+});
 
 // Generate metadata for each post
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -154,6 +196,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     }
 
     const { post, nextPost, prevPost } = data;
+
+    // If the URL slug doesn't exactly match the canonical slug, redirect permanently
+    if (slug !== post.slug) {
+        redirect(`/posts/${post.slug}`);
+    }
     const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
 
     // Generate JSON-LD structured data using centralized schema

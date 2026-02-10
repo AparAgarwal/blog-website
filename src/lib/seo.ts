@@ -6,7 +6,7 @@ const siteConfig = {
     name: 'Apar Agarwal',
     title: 'Apar Agarwal | Engineering Blog',
     description:
-        'Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first. Written for clarity, not completeness.',
+        'Engineering insights on backend development, distributed systems, and software architecture. Practical knowledge from real-world experience.',
     url: process.env.NEXTAUTH_URL || 'http://localhost:3000',
     author: 'Apar Agarwal',
     email: 'aparagarwal01@gmail.com',

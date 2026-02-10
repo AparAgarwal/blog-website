@@ -51,7 +51,7 @@ export async function GET() {
     <channel>
         <title>Apar Agarwal | Engineering Blog</title>
         <link>${baseUrl}</link>
-        <description>Engineering notes breaking and building things. Mostly backend, systems, and things I misunderstood at first. Written for clarity, not completeness.</description>
+        <description>Engineering insights on backend development, distributed systems, and software architecture. Practical knowledge from real-world experience.</description>
         <language>en-us</language>
         <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
         <atom:link href="${baseUrl}/feed.xml" rel="self" type="application/rss+xml" />

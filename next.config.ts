@@ -91,6 +91,9 @@ const nextConfig: NextConfig = {
     },
     async redirects() {
         return [
+            // When renaming a post slug, add a permanent redirect here:
+            // { source: '/posts/old-slug', destination: '/posts/new-slug', permanent: true },
+
             // Redirect RSS to newer format
             {
                 source: '/rss',
