@@ -29,6 +29,8 @@ model Post {
   prevPost   Post?   @relation("PrevPost", fields: [prevPostId], references: [id], onDelete: SetNull)
   incomingPrevPost Post[] @relation("PrevPost")
 
+  slugRedirects SlugRedirect[]
+
   @@index([published, createdAt(sort: Desc)])
 }
 
@@ -46,4 +48,15 @@ model RateLimit {
 
   @@index([expiresAt])
   @@index([key, expiresAt])
+}
+
+model SlugRedirect {
+  id        String   @id @default(cuid())
+  oldSlug   String   @unique
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([oldSlug])
+  @@index([postId])
 }
