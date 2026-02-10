@@ -32,6 +32,12 @@
     font-weight: 500;
 }
 
+.label-hint {
+    font-weight: 400;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
 .input,
 .textarea {
     width: 100%;

@@ -22,6 +22,7 @@ const getInitialNavValue = (config?: string, postId?: string | null) => {
 export default function PostForm({ post }: { post?: Post }) {
     const [slug, setSlug] = useState(post?.slug || '');
     const [content, setContent] = useState(post?.content || '');
+    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
     const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
     const [availablePosts, setAvailablePosts] = useState<{ id: string; title: string }[]>([]);
     const [prevPostValue, setPrevPostValue] = useState(getInitialNavValue(post?.prevNavConfig, post?.prevPostId));
@@ -67,16 +68,17 @@ export default function PostForm({ post }: { post?: Post }) {
 
     const generateSlug = useCallback(
         (title: string) => {
-            if (!post) {
-                setSlug(
-                    title
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]+/g, '-')
-                        .replace(/(^-|-$)+/g, '')
-                );
+            // Only auto-generate slug for new posts AND if not manually edited
+            if (!post && !isSlugManuallyEdited) {
+                const generatedSlug = title
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)+/g, '')
+                    .substring(0, 50); // Truncate to 50 chars max
+                setSlug(generatedSlug);
             }
         },
-        [post]
+        [post, isSlugManuallyEdited]
     );
 
     const handleAction = async (_prevState: unknown, formData: FormData) => {
@@ -134,11 +136,16 @@ export default function PostForm({ post }: { post?: Post }) {
                         />
                     </div>
                     <div className="input-group">
-                        <label className="label">Slug</label>
+                        <label className="label">
+                            Slug <span className="label-hint">(keep short, e.g. &quot;api-rate-limiting&quot;)</span>
+                        </label>
                         <input
                             name="slug"
                             value={slug}
-                            onChange={(e) => setSlug(e.target.value)}
+                            onChange={(e) => {
+                                setSlug(e.target.value);
+                                setIsSlugManuallyEdited(true);
+                            }}
                             required
                             className="input"
                         />

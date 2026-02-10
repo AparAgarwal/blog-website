@@ -179,6 +179,24 @@ export async function updatePost(prevState: FormState | null, formData: FormData
 
         const validatedData = PostSchema.parse(rawData);
 
+        // Check if slug is changing - if so, create a redirect from old slug
+        const existingPost = await prisma.post.findUnique({
+            where: { id },
+            select: { slug: true },
+        });
+
+        if (existingPost && existingPost.slug !== validatedData.slug) {
+            // Create redirect from old slug to new post
+            await prisma.slugRedirect.upsert({
+                where: { oldSlug: existingPost.slug },
+                update: { postId: id },
+                create: {
+                    oldSlug: existingPost.slug,
+                    postId: id,
+                },
+            });
+        }
+
         await prisma.post.update({
             where: { id },
             data: validatedData,
@@ -188,6 +206,10 @@ export async function updatePost(prevState: FormState | null, formData: FormData
         revalidatePath('/');
         revalidatePath('/archive');
         revalidatePath(`/posts/${validatedData.slug}`);
+        if (existingPost && existingPost.slug !== validatedData.slug) {
+            // Also revalidate the old slug path
+            revalidatePath(`/posts/${existingPost.slug}`);
+        }
         return { success: true, message: 'Post updated successfully' };
     } catch (error) {
         if (error instanceof ZodError) {
