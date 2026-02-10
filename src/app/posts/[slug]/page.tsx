@@ -101,6 +101,46 @@ const getPostData = cache(async (slug: string) => {
         });
     }
 
+    // Third attempt: check if this is an old slug that was redirected
+    if (!post) {
+        const slugRedirect = await prisma.slugRedirect.findUnique({
+            where: { oldSlug: slug },
+            select: {
+                post: {
+                    select: {
+                        id: true,
+                        slug: true,
+                        title: true,
+                        content: true,
+                        published: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        tags: true,
+                        nextPostId: true,
+                        nextNavConfig: true,
+                        prevPostId: true,
+                        prevNavConfig: true,
+                        nextPost: {
+                            select: {
+                                slug: true,
+                                title: true,
+                                published: true,
+                            },
+                        },
+                        prevPost: {
+                            select: {
+                                slug: true,
+                                title: true,
+                                published: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        post = slugRedirect?.post ?? null;
+    }
+
     if (!post) return null;
 
     // Helper function to get navigation post based on config
