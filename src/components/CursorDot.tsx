@@ -40,8 +40,8 @@ export default function CursorDot() {
         window.addEventListener('mousemove', onMouseMove);
         const animationId = requestAnimationFrame(animateCursor);
 
-        // Interaction logic
-        const interactiveElements = document.querySelectorAll('a, button, input, textarea');
+        // Interaction logic - hide cursor on interactive and selectable elements
+        const interactiveElements = document.querySelectorAll('a, button, input, textarea, code');
 
         const onMouseEnter = () => cursorDot.classList.add('hidden');
         const onMouseLeave = () => cursorDot.classList.remove('hidden');
