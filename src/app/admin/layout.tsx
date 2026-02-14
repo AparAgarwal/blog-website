@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { authOptions } from '@/auth.config';
 import prisma from '@/lib/db';
+import '../styles/admin.css';
 
 export const metadata: Metadata = {
     title: 'Admin',

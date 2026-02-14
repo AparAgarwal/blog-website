@@ -6,6 +6,7 @@ import { signOut } from 'next-auth/react';
 import { toast } from 'sonner';
 import { changePassword } from '@/app/actions';
 import SubmitButton from '@/components/SubmitButton';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function SettingsPage() {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -61,79 +62,44 @@ export default function SettingsPage() {
 
     return (
         <div className="container" style={{ paddingTop: 40, paddingBottom: 80, maxWidth: '600px' }}>
-            <h1 style={{ marginBottom: 30 }}>Account Settings</h1>
+            <h1 className="page-title">Account Settings</h1>
 
-            <div className="post-card visible" style={{ padding: '30px' }}>
+            <div className="card visible">
                 <h2 style={{ marginBottom: 20, fontSize: '1.25rem' }}>Change Password</h2>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-                            Current Password
-                        </label>
-                        <input
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                            disabled={loading}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-primary)',
-                                fontSize: '16px',
-                            }}
-                        />
-                    </div>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+                    <PasswordInput
+                        label="Current Password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        required
+                        disabled={loading}
+                        className="form-control"
+                        containerClassName="form-group"
+                    />
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>New Password</label>
-                        <input
-                            type="password"
+                    <div className="form-group">
+                        <PasswordInput
+                            label="New Password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                             minLength={12}
                             disabled={loading}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-primary)',
-                                fontSize: '16px',
-                            }}
+                            className="form-control"
                         />
-                        <p style={{ fontSize: '14px', color: 'var(--text-tertiary)', marginTop: '4px' }}>
-                            Minimum 12 characters
-                        </p>
+                        <p className="form-hint">Minimum 12 characters</p>
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-                            Confirm New Password
-                        </label>
-                        <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            disabled={loading}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-primary)',
-                                fontSize: '16px',
-                            }}
-                        />
-                    </div>
+                    <PasswordInput
+                        label="Confirm New Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        disabled={loading}
+                        className="form-control"
+                        containerClassName="form-group"
+                    />
 
                     <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
                         <SubmitButton
@@ -146,13 +112,8 @@ export default function SettingsPage() {
                             type="button"
                             onClick={() => router.push('/admin')}
                             disabled={loading}
+                            className="btn btn-secondary"
                             style={{
-                                padding: '10px 20px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-primary)',
-                                cursor: loading ? 'not-allowed' : 'pointer',
                                 opacity: loading ? 0.6 : 1,
                             }}
                         >

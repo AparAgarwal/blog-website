@@ -4,6 +4,7 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SubmitButton from '@/components/SubmitButton';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -72,25 +73,22 @@ export default function LoginPage() {
                             }}
                         />
                     </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px' }}>Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            disabled={isLoading}
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '4px',
-                                border: '1px solid var(--border-color)',
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-primary)',
-                                opacity: isLoading ? 0.6 : 1,
-                            }}
-                        />
-                    </div>
+                    <PasswordInput
+                        label="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        disabled={isLoading}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border-color)',
+                            background: 'var(--bg-secondary)',
+                            color: 'var(--text-primary)',
+                            opacity: isLoading ? 0.6 : 1,
+                        }}
+                    />
                     {error && (
                         <div
                             style={{
