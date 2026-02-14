@@ -40,11 +40,11 @@ const CodeBlock = ({
                                 strokeWidth="2"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                style={{ color: '#4ade80' }}
+                                className="copy-success-icon"
                             >
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            <span style={{ color: '#4ade80' }}>Copied!</span>
+                            <span className="copy-success-text">Copied!</span>
                         </>
                     ) : (
                         <>
