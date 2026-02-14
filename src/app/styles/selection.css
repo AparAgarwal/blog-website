@@ -1,0 +1,21 @@
+/* ============================================
+   Selection Styles - Keep syntax colors, change background only
+   ============================================ */
+
+/* Default selection - brand blue background */
+::selection {
+    background: rgba(102, 126, 234, 0.35);
+}
+
+::-moz-selection {
+    background: rgba(102, 126, 234, 0.35);
+}
+
+/* Light theme - lighter background */
+[data-theme='light']::selection {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+[data-theme='light']::-moz-selection {
+    background: rgba(102, 126, 234, 0.2);
+}
