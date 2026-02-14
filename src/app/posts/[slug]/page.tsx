@@ -6,7 +6,7 @@ import type { ComponentProps } from 'react';
 import prisma from '@/lib/db';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
+import rehypePrettyCode from 'rehype-pretty-code';
 import CodeBlock from '@/components/CodeBlock';
 import { getBlogPostingSchema } from '@/lib/seo';
 
@@ -288,7 +288,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     options={{
                         mdxOptions: {
                             remarkPlugins: [remarkGfm],
-                            rehypePlugins: [rehypeHighlight],
+                            rehypePlugins: [
+                                [
+                                    rehypePrettyCode,
+                                    {
+                                        theme: {
+                                            dark: 'dark-plus',
+                                            light: 'light-plus',
+                                        },
+                                        keepBackground: false,
+                                    },
+                                ],
+                            ],
                         },
                     }}
                     components={{
