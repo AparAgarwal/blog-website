@@ -216,13 +216,6 @@
         font-size: 11px;
     }
 
-    /* Code blocks full width on mobile */
-    .post-content pre {
-        margin-left: -20px;
-        margin-right: -20px;
-        border-radius: 0;
-    }
-
     .cursor-dot {
         display: none;
     }
