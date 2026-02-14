@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
     compress: true,
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+                port: '',
+                pathname: '/**',
+            },
+        ],
+    },
     async headers() {
         return [
             {
@@ -45,7 +55,7 @@ const nextConfig: NextConfig = {
                     // SEO & Performance Headers
                     {
                         key: 'Content-Security-Policy',
-                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;",
+                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://upload-widget.cloudinary.com https://widget.cloudinary.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob: https://res.cloudinary.com; connect-src 'self' https: https://api.cloudinary.com; frame-src https://upload-widget.cloudinary.com;",
                     },
                     {
                         key: 'Link',

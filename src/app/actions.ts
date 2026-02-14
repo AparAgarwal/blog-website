@@ -355,3 +355,109 @@ export async function changePassword(prevState: FormState | null, formData: Form
         return { success: false, message: 'Failed to change password' };
     }
 }
+
+// Image Management Actions
+const ImageSchema = z.object({
+    url: z.string().url(),
+    publicId: z.string(),
+    filename: z.string(),
+    size: z.number().max(10485760, 'File size must be less than 10MB'),
+    mimeType: z.string(),
+    width: z.number().optional(),
+    height: z.number().optional(),
+});
+
+export async function uploadImage(imageData: z.infer<typeof ImageSchema>) {
+    try {
+        const session = await checkAuth();
+
+        const validatedData = ImageSchema.parse(imageData);
+
+        await prisma.image.create({
+            data: {
+                ...validatedData,
+                uploadedBy: session.user.email!,
+            },
+        });
+
+        return { success: true, message: 'Image uploaded successfully' };
+    } catch (error) {
+        if (error instanceof ZodError) {
+            return { success: false, message: error.issues[0]?.message };
+        }
+        if (error instanceof Error && error.message === 'Unauthorized') {
+            return { success: false, message: 'Unauthorized. Please login again.' };
+        }
+        return { success: false, message: 'Failed to upload image' };
+    }
+}
+
+export async function getImages() {
+    try {
+        await checkAuth();
+
+        const images = await prisma.image.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
+
+        return images;
+    } catch (_error) {
+        return [];
+    }
+}
+
+export async function deleteImage(id: string, publicId: string) {
+    try {
+        await checkAuth();
+
+        // Delete from Cloudinary
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const apiKey = process.env.CLOUDINARY_API_KEY;
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+        if (!cloudName || !apiKey || !apiSecret) {
+            throw new Error('Cloudinary credentials not configured');
+        }
+
+        // Generate timestamp and signature for Cloudinary API
+        const timestamp = Math.floor(Date.now() / 1000);
+        const crypto = require('crypto');
+        const signature = crypto
+            .createHash('sha1')
+            .update(`public_id=${publicId}&timestamp=${timestamp}${apiSecret}`)
+            .digest('hex');
+
+        // Delete from Cloudinary
+        const params = new URLSearchParams();
+        params.append('public_id', publicId);
+        params.append('api_key', apiKey);
+        params.append('timestamp', timestamp.toString());
+        params.append('signature', signature);
+
+        const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`, {
+            method: 'POST',
+            body: params,
+        });
+
+        const cloudinaryResult = await cloudinaryResponse.json();
+
+        if (cloudinaryResult.result !== 'ok') {
+            console.error('Cloudinary deletion failed:', cloudinaryResult);
+            return {
+                success: false,
+                message: 'Failed to delete from cloud storage. Image was not deleted.',
+            };
+        }
+
+        // Delete from database only if Cloudinary deletion succeeded
+        await prisma.image.delete({ where: { id } });
+
+        revalidatePath('/admin/images');
+        return { success: true, message: 'Image deleted successfully' };
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Unauthorized') {
+            return { success: false, message: 'Unauthorized. Please login again.' };
+        }
+        return { success: false, message: 'Failed to delete image' };
+    }
+}

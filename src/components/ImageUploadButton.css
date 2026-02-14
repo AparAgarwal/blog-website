@@ -1,0 +1,60 @@
+/* ============================================
+   Image Upload Button Styles
+   ============================================ */
+
+.image-upload-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--button-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Outfit', sans-serif;
+}
+
+.image-upload-button:hover:not(:disabled) {
+    background: var(--hover-bg);
+    border-color: var(--text-secondary);
+}
+
+.image-upload-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.image-upload-button svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.upload-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Light theme */
+[data-theme='light'] .image-upload-button {
+    background: #ffffff;
+    border-color: #d1d5db;
+}
+
+[data-theme='light'] .image-upload-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}

@@ -1,7 +1,7 @@
 'use client';
 
-import { createPost, updatePost, getAllPostsForSelect } from '@/app/actions';
-import { useState, useEffect, useMemo, useCallback, useActionState } from 'react';
+import { createPost, updatePost, getAllPostsForSelect, uploadImage } from '@/app/actions';
+import { useState, useEffect, useMemo, useCallback, useActionState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
@@ -11,6 +11,8 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Post } from '@prisma/client';
 import SearchableSelect from './SearchableSelect';
 import SubmitButton from './SubmitButton';
+import ImageUploadButton from './ImageUploadButton';
+import './ImageUploadButton.css';
 
 // Helper to get initial nav config value
 const getInitialNavValue = (config?: string, postId?: string | null) => {
@@ -28,6 +30,7 @@ export default function PostForm({ post }: { post?: Post }) {
     const [availablePosts, setAvailablePosts] = useState<{ id: string; title: string }[]>([]);
     const [prevPostValue, setPrevPostValue] = useState(getInitialNavValue(post?.prevNavConfig, post?.prevPostId));
     const [nextPostValue, setNextPostValue] = useState(getInitialNavValue(post?.nextNavConfig, post?.nextPostId));
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const router = useRouter();
 
     // Load initial posts (limited)
@@ -117,6 +120,81 @@ export default function PostForm({ post }: { post?: Post }) {
             textarea.focus();
             textarea.setSelectionRange(start + before.length, end + before.length);
         }, 0);
+    };
+
+    // Handle image upload and insert markdown
+    const handleImageUpload = (url: string) => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const newText = content.substring(0, start) + `![image](${url})` + content.substring(start);
+        setContent(newText);
+
+        // Set cursor position after image
+        setTimeout(() => {
+            const newCursorPos = start + `![image](${url})`.length;
+            textarea.focus();
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
+
+    // Handle clipboard paste for images
+    const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (const item of Array.from(items)) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+
+                const file = item.getAsFile();
+                if (!file) continue;
+
+                // Show uploading toast
+                toast.loading('Uploading image...');
+
+                // Create FormData for upload
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
+
+                try {
+                    // Upload to Cloudinary
+                    const response = await fetch(
+                        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                        {
+                            method: 'POST',
+                            body: formData,
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (data.secure_url) {
+                        // Save to database
+                        await uploadImage({
+                            url: data.secure_url,
+                            publicId: data.public_id,
+                            filename: data.original_filename || 'pasted-image',
+                            size: data.bytes,
+                            mimeType: data.format ? `image/${data.format}` : 'image/jpeg',
+                            width: data.width,
+                            height: data.height,
+                        });
+
+                        handleImageUpload(data.secure_url);
+                        toast.dismiss();
+                        toast.success('Image pasted successfully!');
+                    }
+                } catch (error) {
+                    console.error('Paste upload error:', error);
+                    toast.dismiss();
+                    toast.error('Failed to upload pasted image');
+                }
+                break;
+            }
+        }
     };
 
     return (
@@ -284,12 +362,15 @@ export default function PostForm({ post }: { post?: Post }) {
                             >
                                 Link
                             </button>
+                            <ImageUploadButton onImageUploaded={handleImageUpload} />
                         </div>
                     </div>
                     <textarea
+                        ref={textareaRef}
                         name="content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
+                        onPaste={handlePaste}
                         required
                         placeholder="Write your markdown here..."
                         className="editor-textarea"
@@ -305,15 +386,15 @@ export default function PostForm({ post }: { post?: Post }) {
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                                code({ 
-                                    inline, 
-                                    className, 
-                                    children, 
-                                    ...props 
+                                code({
+                                    inline,
+                                    className,
+                                    children,
+                                    ...props
                                 }: React.HTMLAttributes<HTMLElement> & { inline?: boolean }) {
                                     const match = /language-(\w+)/.exec(className || '');
                                     const language = match ? match[1] : '';
-                                    
+
                                     return !inline && language ? (
                                         <SyntaxHighlighter
                                             // @ts-expect-error - Style types from react-syntax-highlighter are compatible
