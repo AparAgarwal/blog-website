@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Post } from '@prisma/client';
 import SearchableSelect from './SearchableSelect';
 import SubmitButton from './SubmitButton';
@@ -301,7 +302,42 @@ export default function PostForm({ post }: { post?: Post }) {
                         <div className="header-title">Live Preview</div>
                     </div>
                     <div className="markdown-preview post-content">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                code({ 
+                                    inline, 
+                                    className, 
+                                    children, 
+                                    ...props 
+                                }: React.HTMLAttributes<HTMLElement> & { inline?: boolean }) {
+                                    const match = /language-(\w+)/.exec(className || '');
+                                    const language = match ? match[1] : '';
+                                    
+                                    return !inline && language ? (
+                                        <SyntaxHighlighter
+                                            // @ts-expect-error - Style types from react-syntax-highlighter are compatible
+                                            style={vscDarkPlus}
+                                            language={language}
+                                            showLineNumbers={false}
+                                            wrapLongLines={true}
+                                            customStyle={{
+                                                margin: '1.5rem 0',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.9rem',
+                                            }}
+                                            {...props}
+                                        >
+                                            {String(children).replace(/\n$/, '')}
+                                        </SyntaxHighlighter>
+                                    ) : (
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                },
+                            }}
+                        >
                             {content}
                         </ReactMarkdown>
                     </div>
