@@ -2,12 +2,10 @@
    Global Styles - Blog Application
    ============================================ */
 
-/* External Dependencies */
-@import 'highlight.js/styles/atom-one-dark.css';
-
 /* Core Theme + Base */
 @import './styles/variables.css';
 @import './styles/base.css';
+@import './styles/selection.css';
 
 /* Layout & UI Components */
 @import './styles/layout.css';

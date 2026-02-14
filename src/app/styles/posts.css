@@ -423,6 +423,7 @@
 /* ============================================
    Markdown Content Styling
    ============================================ */
+
 .post-content {
     font-family: 'Georgia', serif;
     font-size: clamp(16px, 2vw, 20px);
@@ -431,7 +432,19 @@
 }
 
 .post-content p {
-    margin-bottom: clamp(20px, 3vw, 32px);
+    margin-bottom: clamp(20px, 3vw, 24px);
+}
+
+.post-content strong,
+.post-content b {
+    font-weight: 700;
+    color: var(--title-bold);
+}
+
+.post-content em,
+.post-content i {
+    font-style: italic;
+    color: var(--text-secondary);
 }
 
 .post-content h2 {
@@ -476,7 +489,6 @@
     border-left: 4px solid #667eea;
     margin: clamp(28px, 4vw, 40px) 0;
     padding: clamp(8px, 1.2vw, 10px) 0 clamp(8px, 1.2vw, 10px) clamp(16px, 2.5vw, 24px);
-    font-style: italic;
     font-size: clamp(15px, 1.8vw, 19px);
     color: var(--text-secondary);
     background: var(--hover-bg);
@@ -487,32 +499,21 @@
     margin-bottom: 0;
 }
 
-.post-content pre {
-    background: #121212;
-    padding: clamp(16px, 2.5vw, 24px);
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: clamp(28px, 4vw, 40px) 0;
-    border: 1px solid var(--border-color);
-}
-
-.post-content code {
+/* Inline code styling */
+.post-content :not(pre) > code {
     font-family: 'Courier New', monospace;
     font-size: clamp(0.85em, 1.5vw, 0.9em);
-}
-
-.post-content code {
     background: var(--hover-bg);
     padding: 2px 6px;
     border-radius: 4px;
-    font-family: 'Courier New', monospace;
     color: #ffa7c4;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
 }
 
-.post-content pre code {
-    color: #e0e0e0 !important;
-    background: none !important;
-    padding: 0 !important;
+[data-theme='light'] .post-content :not(pre) > code {
+    color: #d63384;
 }
 
 .post-content img {
@@ -527,6 +528,10 @@
     text-decoration: underline;
     text-underline-offset: 4px;
     transition: color 0.2s;
+}
+
+.post-content a:hover {
+    color: #764ba2;
 }
 
 .post-content hr {
@@ -550,7 +555,7 @@
     border-collapse: collapse;
     margin: 0;
     font-size: clamp(14px, 1.8vw, 18px);
-    border: 1px solid var(--border-color);
+    border: 3px solid var(--border-color);
 }
 
 .post-content table thead th {
@@ -587,34 +592,6 @@
 
 .post-content table tbody td:last-child {
     border-right: none;
-}
-
-.post-content table tbody td code {
-    background: var(--hover-bg);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    color: #d63384;
-    font-size: clamp(0.8em, 1.4vw, 0.85em);
-}
-
-.post-content a:hover {
-    color: #764ba2;
-}
-
-/* Light theme code overrides */
-[data-theme='light'] .post-content pre {
-    background: #121212;
-    border-color: #2d2d2d;
-}
-
-[data-theme='light'] .post-content pre code {
-    color: #e5e7eb;
-}
-
-[data-theme='light'] .post-content code {
-    color: #c7254e;
-    background: rgba(199, 37, 78, 0.12);
 }
 
 /* ============================================

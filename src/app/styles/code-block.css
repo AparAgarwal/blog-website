@@ -1,14 +1,15 @@
 /* ============================================
-   Code Block Styles
+   Code Block Styles (Shiki Integration)
    ============================================ */
 .code-block-wrapper {
     position: relative;
     margin: 24px 0;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background-color: #1e1e1e;
+    background-color: #0e0e0e;
     display: grid;
     grid-template-columns: 100%;
+    overflow: hidden;
 }
 
 .copy-button-container {
@@ -27,21 +28,19 @@
 .copy-button {
     margin: 16px;
     padding: 6px 10px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: #9ca3af;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    transition:
-        all 0.3s ease,
-        opacity 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
     pointer-events: auto;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-family: 'Outfit', sans-serif;
     font-size: 13px;
     font-weight: 500;
@@ -49,24 +48,85 @@
 }
 
 .code-block-wrapper:hover .copy-button {
-    background-color: rgba(255, 255, 255, 0.1);
     opacity: 1;
 }
 
 .copy-button:hover {
     background-color: rgba(255, 255, 255, 0.15);
     color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
 }
 
 .code-block-pre {
     grid-area: 1 / 1;
-    padding: 16px;
-    padding-top: 16px;
+    margin: clamp(16px, 2.5vw, 32px);
     overflow-x: auto;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+}
+
+.code-block-pre code {
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+}
+
+/* Copy success state */
+.copy-success-icon,
+.copy-success-text {
+    color: #4ade80;
+}
+
+/* ============================================
+   Light Theme Overrides
+   ============================================ */
+
+[data-theme='light'] .code-block-wrapper {
+    background-color: #f8f8f8;
+    border-color: #d1d5db;
+}
+
+[data-theme='light'] .copy-button {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #4b5563;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='light'] .copy-button:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #1f2937;
+    border-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Light theme copy success state */
+[data-theme='light'] .copy-success-icon,
+[data-theme='light'] .copy-success-text {
+    color: #16a34a;
+}
+
+/* ============================================
+   Shiki Dual Theme Switching
+   ============================================ */
+
+/* Light theme: use light theme syntax colors */
+code[data-theme*=' '],
+code[data-theme*=' '] span {
+    color: var(--shiki-light);
     background-color: transparent;
-    color: #e5e7eb;
-    border-radius: 8px;
-    margin: 0 !important;
-    border: none;
+}
+
+/* Dark theme: use dark theme syntax colors */
+[data-theme='dark'] code[data-theme*=' '],
+[data-theme='dark'] code[data-theme*=' '] span {
+    color: var(--shiki-dark);
+    background-color: transparent;
+}
+
+/* Ensure no default theme attribute (root dark) also uses dark */
+:root:not([data-theme]) code[data-theme*=' '],
+:root:not([data-theme]) code[data-theme*=' '] span {
+    color: var(--shiki-dark);
+    background-color: transparent;
 }
