@@ -3,6 +3,7 @@ import { Borel, Comfortaa, Outfit } from 'next/font/google';
 import './globals.css';
 import RootLayoutClient from './layout-client';
 import { getOrganizationSchema, getWebsiteSchema } from '@/lib/seo';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const borel = Borel({ subsets: ['latin'], weight: '400', variable: '--font-borel', display: 'swap' });
 const comfortaa = Comfortaa({
@@ -162,6 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </head>
             <body className={`${borel.variable} ${comfortaa.variable} ${outfit.variable}`}>
                 <RootLayoutClient>{children}</RootLayoutClient>
+                <SpeedInsights />
             </body>
         </html>
     );
