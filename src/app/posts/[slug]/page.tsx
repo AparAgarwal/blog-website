@@ -12,6 +12,8 @@ import { getBlogPostingSchema } from '@/lib/seo';
 
 // Revalidate every 10 minutes (600 seconds)
 export const revalidate = 600;
+// Allow new posts published after build to be rendered on-demand
+export const dynamicParams = true;
 
 const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 

@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
 import prisma from '@/lib/db';
 
+// Regenerate sitemap every hour so new posts are picked up without a full rebuild
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
