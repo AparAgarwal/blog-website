@@ -7,6 +7,7 @@ import { authOptions } from '@/auth.config';
 import { z, ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { notifySearchEngine } from '@/lib/google-indexing';
 
 const PostSchema = z.object({
     title: z.string().min(1, 'Title is required').max(200, 'Title is too long'),
@@ -101,6 +102,13 @@ export async function createPost(prevState: FormState | null, formData: FormData
         await prisma.post.create({
             data: validatedData,
         });
+
+        // Notify Google Indexing API
+        if (validatedData.published && process.env.SITE_URL) {
+            notifySearchEngine(`${process.env.SITE_URL}/posts/${validatedData.slug}`, 'URL_UPDATED').catch(
+                console.error
+            );
+        }
 
         revalidatePath('/admin');
         revalidatePath('/');
@@ -202,6 +210,23 @@ export async function updatePost(prevState: FormState | null, formData: FormData
             data: validatedData,
         });
 
+        // Notify Google Indexing API
+        if (process.env.SITE_URL) {
+            const newUrl = `${process.env.SITE_URL}/posts/${validatedData.slug}`;
+
+            // If slug changed, remove old URL
+            if (existingPost && existingPost.slug !== validatedData.slug) {
+                const oldUrl = `${process.env.SITE_URL}/posts/${existingPost.slug}`;
+                notifySearchEngine(oldUrl, 'URL_DELETED').catch(console.error);
+            }
+
+            if (validatedData.published) {
+                notifySearchEngine(newUrl, 'URL_UPDATED').catch(console.error);
+            } else {
+                notifySearchEngine(newUrl, 'URL_DELETED').catch(console.error);
+            }
+        }
+
         revalidatePath('/admin');
         revalidatePath('/');
         revalidatePath('/archive');
@@ -243,8 +268,21 @@ export async function deletePost(id: string) {
             data: { prevNavConfig: 'default' },
         });
 
+        // Get post to delete to know its slug
+        const postToDelete = await prisma.post.findUnique({
+            where: { id },
+            select: { slug: true },
+        });
+
         // Delete the post (cascade will set foreign keys to null)
         await prisma.post.delete({ where: { id } });
+
+        // Notify Google Indexing API
+        if (postToDelete && process.env.SITE_URL) {
+            notifySearchEngine(`${process.env.SITE_URL}/posts/${postToDelete.slug}`, 'URL_DELETED').catch(
+                console.error
+            );
+        }
 
         revalidatePath('/admin');
         revalidatePath('/');
