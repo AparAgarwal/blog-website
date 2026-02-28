@@ -4,6 +4,7 @@ import './globals.css';
 import RootLayoutClient from './layout-client';
 import { getOrganizationSchema, getWebsiteSchema } from '@/lib/seo';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
 const borel = Borel({ subsets: ['latin'], weight: '400', variable: '--font-borel', display: 'swap' });
 const comfortaa = Comfortaa({
@@ -164,6 +165,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body className={`${borel.variable} ${comfortaa.variable} ${outfit.variable}`}>
                 <RootLayoutClient>{children}</RootLayoutClient>
                 <SpeedInsights />
+                <Analytics />
             </body>
         </html>
     );
