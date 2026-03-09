@@ -444,7 +444,6 @@
 .post-content em,
 .post-content i {
     font-style: italic;
-    color: var(--text-secondary);
 }
 
 .post-content h2 {
