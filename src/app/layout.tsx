@@ -5,6 +5,8 @@ import RootLayoutClient from './layout-client';
 import { getOrganizationSchema, getWebsiteSchema } from '@/lib/seo';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth.config';
 
 const borel = Borel({ subsets: ['latin'], weight: '400', variable: '--font-borel', display: 'swap' });
 const comfortaa = Comfortaa({
@@ -123,9 +125,11 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
     const organizationSchema = getOrganizationSchema();
     const websiteSchema = getWebsiteSchema();
+    const session = await getServerSession(authOptions);
+    const isAdmin = !!session?.user?.email;
 
     return (
         <html lang="en" suppressHydrationWarning>
@@ -163,7 +167,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <link rel="dns-prefetch" href="https://www.google-analytics.com" />
             </head>
             <body className={`${borel.variable} ${comfortaa.variable} ${outfit.variable}`}>
-                <RootLayoutClient>{children}</RootLayoutClient>
+                <RootLayoutClient isAdmin={isAdmin}>{children}</RootLayoutClient>
                 <SpeedInsights />
                 <Analytics />
             </body>

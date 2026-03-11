@@ -46,6 +46,14 @@ export default async function AdminPage() {
                             </span>
                         </div>
                         <div className="post-actions">
+                            <Link
+                                href={`/posts/${post.slug}`}
+                                className="post-link"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Preview
+                            </Link>
                             <Link href={`/admin/${post.slug}/edit`} className="post-link">
                                 Edit
                             </Link>

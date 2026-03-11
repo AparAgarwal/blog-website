@@ -9,6 +9,9 @@ import remarkGfm from 'remark-gfm';
 import rehypePrettyCode from 'rehype-pretty-code';
 import CodeBlock from '@/components/CodeBlock';
 import { getBlogPostingSchema } from '@/lib/seo';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth.config';
+import PublishPostButton from '@/components/PublishPostButton';
 
 // Revalidate every 10 minutes (600 seconds)
 export const revalidate = 600;
@@ -176,8 +179,10 @@ const getPostData = cache(async (slug: string) => {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     const data = await getPostData(slug);
+    const session = await getServerSession(authOptions);
+    const isAdmin = !!session?.user?.email;
 
-    if (!data || !data.post || !data.post.published) {
+    if (!data || !data.post || (!data.post.published && !isAdmin)) {
         return {
             title: 'Post Not Found',
             robots: {
@@ -232,8 +237,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const data = await getPostData(slug);
+    const session = await getServerSession(authOptions);
+    const isAdmin = !!session?.user?.email;
 
-    if (!data || !data.post || !data.post.published) {
+    if (!data || !data.post || (!data.post.published && !isAdmin)) {
         notFound();
     }
 
@@ -259,6 +266,59 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     return (
         <article className="post-page">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+            {isAdmin && (
+                <div
+                    style={{
+                        marginBottom: '2rem',
+                        padding: '1rem',
+                        backgroundColor: 'var(--admin-yellow-bg)',
+                        border: '1px solid var(--admin-yellow-border)',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '1rem',
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span
+                            style={{
+                                fontWeight: 'bold',
+                                color: 'var(--admin-yellow-text)',
+                                fontSize: '0.9rem',
+                                letterSpacing: '0.5px',
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            Admin View
+                        </span>
+                        {!post.published && (
+                            <span
+                                className="tag"
+                                style={{
+                                    margin: 0,
+                                    backgroundColor: 'var(--admin-yellow-bg)',
+                                    color: 'var(--admin-yellow-text)',
+                                    borderColor: 'var(--admin-yellow-border)',
+                                }}
+                            >
+                                Draft
+                            </span>
+                        )}
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        {!post.published && <PublishPostButton id={post.id.toString()} />}
+                        <Link
+                            href={`/admin/${post.slug}/edit`}
+                            className="btn btn-admin-secondary"
+                            style={{ padding: '6px 16px', fontSize: '0.9rem' }}
+                        >
+                            Edit Post
+                        </Link>
+                    </div>
+                </div>
+            )}
             <header className="post-header">
                 <div className="post-meta">
                     <time className="post-date" dateTime={post.createdAt.toISOString()}>

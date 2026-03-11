@@ -21,6 +21,14 @@
     --pattern-purple: rgba(139, 92, 246, 0.2);
     --pattern-blue: rgba(59, 130, 246, 0.18);
     --pattern-pink: rgba(236, 72, 153, 0.15);
+
+    /* Admin Yellow Theme (Dark Mode) */
+    --admin-yellow-bg: rgba(250, 204, 21, 0.1); /* yellow-400 10% */
+    --admin-yellow-border: rgba(250, 204, 21, 0.3);
+    --admin-yellow-text: #facc15; /* yellow-400 */
+    --admin-yellow-btn: #facc15;
+    --admin-yellow-btn-hover: #eab308;
+    --admin-yellow-btn-text: #171717;
 }
 
 [data-theme='light'] {
@@ -41,4 +49,12 @@
     --pattern-purple: rgba(139, 92, 246, 0.4);
     --pattern-blue: rgba(59, 130, 246, 0.35);
     --pattern-pink: rgba(236, 72, 153, 0.35);
+
+    /* Admin Yellow Theme (Light Mode) */
+    --admin-yellow-bg: rgba(202, 138, 4, 0.1); /* yellow-600 10% */
+    --admin-yellow-border: rgba(202, 138, 4, 0.3);
+    --admin-yellow-text: #a16207; /* yellow-700 */
+    --admin-yellow-btn: #ca8a04; /* yellow-600 */
+    --admin-yellow-btn-hover: #a16207; /* yellow-700 */
+    --admin-yellow-btn-text: #ffffff;
 }

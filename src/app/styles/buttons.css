@@ -59,3 +59,27 @@
     background-color: rgba(255, 0, 0, 0.15);
     transform: translateY(-1px);
 }
+
+/* Admin Specific Buttons */
+.btn-admin-primary {
+    background-color: var(--admin-yellow-btn);
+    color: var(--admin-yellow-btn-text);
+    border-color: var(--admin-yellow-btn);
+}
+
+.btn-admin-primary:hover {
+    background-color: var(--admin-yellow-btn-hover);
+    border-color: var(--admin-yellow-btn-hover);
+    transform: translateY(-1px);
+}
+
+.btn-admin-secondary {
+    background-color: transparent;
+    color: var(--admin-yellow-text);
+    border-color: var(--admin-yellow-border);
+}
+
+.btn-admin-secondary:hover {
+    background-color: var(--admin-yellow-bg);
+    transform: translateY(-1px);
+}

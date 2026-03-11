@@ -6,7 +6,7 @@ import CursorDot from '@/components/CursorDot';
 import ToastProvider from '@/components/ToastProvider';
 import { useState, useEffect } from 'react';
 
-export default function RootLayoutClient({ children }: { children: React.ReactNode }) {
+export default function RootLayoutClient({ children, isAdmin }: { children: React.ReactNode; isAdmin?: boolean }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -58,6 +58,11 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
                             <Link href="/archive" onClick={closeMenu} role="menuitem">
                                 Archive
                             </Link>
+                            {isAdmin && (
+                                <Link href="/admin" onClick={closeMenu} role="menuitem" className="admin-nav-link">
+                                    Dashboard
+                                </Link>
+                            )}
                             <Link
                                 href="https://aparagarwal.tech"
                                 target="_blank"

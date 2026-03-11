@@ -296,6 +296,38 @@ export async function deletePost(id: string) {
     }
 }
 
+export async function togglePostPublishStatus(id: string, published: boolean) {
+    try {
+        await checkAuth();
+
+        const post = await prisma.post.update({
+            where: { id },
+            data: { published },
+        });
+
+        // Notify Google Indexing API
+        if (process.env.SITE_URL) {
+            const url = `${process.env.SITE_URL}/posts/${post.slug}`;
+            if (published) {
+                notifySearchEngine(url, 'URL_UPDATED').catch(console.error);
+            } else {
+                notifySearchEngine(url, 'URL_DELETED').catch(console.error);
+            }
+        }
+
+        revalidatePath('/admin');
+        revalidatePath('/');
+        revalidatePath('/archive');
+        revalidatePath(`/posts/${post.slug}`);
+        return { success: true, message: `Post ${published ? 'published' : 'unpublished'} successfully` };
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Unauthorized') {
+            return { success: false, message: 'Unauthorized. Please login again.' };
+        }
+        return { success: false, message: 'Failed to update post status' };
+    }
+}
+
 // Pagination action
 export async function fetchPosts(page: number, limit: number) {
     try {
