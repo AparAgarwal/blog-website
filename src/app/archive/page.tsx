@@ -51,6 +51,16 @@ async function getAllPosts() {
         where: { published: true },
         orderBy: { createdAt: 'desc' },
         take: 12, // Initial limit for pagination
+        select: {
+            id: true,
+            slug: true,
+            title: true,
+            excerpt: true,
+            tags: true,
+            createdAt: true,
+            updatedAt: true,
+            published: true,
+        },
     });
     return posts;
 }

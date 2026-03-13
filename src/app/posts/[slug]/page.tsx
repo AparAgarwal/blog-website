@@ -8,13 +8,14 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import rehypePrettyCode from 'rehype-pretty-code';
 import CodeBlock from '@/components/CodeBlock';
+import PostContent from '@/components/PostContent';
 import { getBlogPostingSchema } from '@/lib/seo';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth.config';
 import PublishPostButton from '@/components/PublishPostButton';
 
-// Revalidate every 10 minutes (600 seconds)
-export const revalidate = 600;
+// Revalidate every hour (3600 seconds) — content rarely changes
+export const revalidate = 3600;
 // Allow new posts published after build to be rendered on-demand
 export const dynamicParams = true;
 
@@ -41,6 +42,7 @@ const getPostData = cache(async (slug: string) => {
             slug: true,
             title: true,
             content: true,
+            compiledContent: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -66,47 +68,7 @@ const getPostData = cache(async (slug: string) => {
         },
     });
 
-    // Second attempt: case-insensitive fallback
-    if (!post) {
-        post = await prisma.post.findFirst({
-            where: {
-                slug: {
-                    equals: slug,
-                    mode: 'insensitive',
-                },
-            },
-            select: {
-                id: true,
-                slug: true,
-                title: true,
-                content: true,
-                published: true,
-                createdAt: true,
-                updatedAt: true,
-                tags: true,
-                nextPostId: true,
-                nextNavConfig: true,
-                prevPostId: true,
-                prevNavConfig: true,
-                nextPost: {
-                    select: {
-                        slug: true,
-                        title: true,
-                        published: true,
-                    },
-                },
-                prevPost: {
-                    select: {
-                        slug: true,
-                        title: true,
-                        published: true,
-                    },
-                },
-            },
-        });
-    }
-
-    // Third attempt: check if this is an old slug that was redirected
+    // Second attempt: check if this is an old slug that was redirected
     if (!post) {
         const slugRedirect = await prisma.slugRedirect.findUnique({
             where: { oldSlug: slug },
@@ -117,6 +79,7 @@ const getPostData = cache(async (slug: string) => {
                         slug: true,
                         title: true,
                         content: true,
+                        compiledContent: true,
                         published: true,
                         createdAt: true,
                         updatedAt: true,
@@ -344,36 +307,40 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     </div>
                 )}
             </header>
-            <div className="post-content">
-                <MDXRemote
-                    source={post.content}
-                    options={{
-                        mdxOptions: {
-                            remarkPlugins: [remarkGfm],
-                            rehypePlugins: [
-                                [
-                                    rehypePrettyCode,
-                                    {
-                                        theme: {
-                                            dark: 'dark-plus',
-                                            light: 'light-plus',
+            {post.compiledContent ? (
+                <PostContent html={post.compiledContent} />
+            ) : (
+                <div className="post-content">
+                    <MDXRemote
+                        source={post.content}
+                        options={{
+                            mdxOptions: {
+                                remarkPlugins: [remarkGfm],
+                                rehypePlugins: [
+                                    [
+                                        rehypePrettyCode,
+                                        {
+                                            theme: {
+                                                dark: 'dark-plus',
+                                                light: 'light-plus',
+                                            },
+                                            keepBackground: false,
                                         },
-                                        keepBackground: false,
-                                    },
+                                    ],
                                 ],
-                            ],
-                        },
-                    }}
-                    components={{
-                        pre: CodeBlock,
-                        table: (props: ComponentProps<'table'>) => (
-                            <div className="table-wrapper">
-                                <table {...props} />
-                            </div>
-                        ),
-                    }}
-                />
-            </div>
+                            },
+                        }}
+                        components={{
+                            pre: CodeBlock,
+                            table: (props: ComponentProps<'table'>) => (
+                                <div className="table-wrapper">
+                                    <table {...props} />
+                                </div>
+                            ),
+                        }}
+                    />
+                </div>
+            )}
 
             <div className="post-navigation-footer">
                 <div className="post-nav-grid">

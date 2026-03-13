@@ -8,6 +8,7 @@ import { z, ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { notifySearchEngine } from '@/lib/google-indexing';
+import { compileMarkdownToHtml } from '@/lib/mdx-compiler';
 
 const PostSchema = z.object({
     title: z.string().min(1, 'Title is required').max(200, 'Title is too long'),
@@ -99,8 +100,16 @@ export async function createPost(prevState: FormState | null, formData: FormData
 
         const validatedData = PostSchema.parse(rawData);
 
+        // Pre-compile MDX to HTML at write-time (eliminates Shiki from read path)
+        let compiledContent: string | null = null;
+        try {
+            compiledContent = await compileMarkdownToHtml(validatedData.content);
+        } catch (compileError) {
+            console.error('MDX compilation failed, will fall back to runtime compilation:', compileError);
+        }
+
         await prisma.post.create({
-            data: validatedData,
+            data: { ...validatedData, compiledContent },
         });
 
         // Notify Google Indexing API
@@ -190,7 +199,7 @@ export async function updatePost(prevState: FormState | null, formData: FormData
         // Check if slug is changing - if so, create a redirect from old slug
         const existingPost = await prisma.post.findUnique({
             where: { id },
-            select: { slug: true },
+            select: { slug: true, content: true },
         });
 
         if (existingPost && existingPost.slug !== validatedData.slug) {
@@ -205,9 +214,23 @@ export async function updatePost(prevState: FormState | null, formData: FormData
             });
         }
 
+        // Re-compile MDX if content changed
+        let compiledContent: string | null = null;
+        if (!existingPost || existingPost.content !== validatedData.content) {
+            try {
+                compiledContent = await compileMarkdownToHtml(validatedData.content);
+            } catch (compileError) {
+                console.error('MDX compilation failed, will fall back to runtime compilation:', compileError);
+            }
+        }
+
+        const updateData = compiledContent !== null
+            ? { ...validatedData, compiledContent }
+            : validatedData;
+
         await prisma.post.update({
             where: { id },
-            data: validatedData,
+            data: updateData,
         });
 
         // Notify Google Indexing API
@@ -328,14 +351,27 @@ export async function togglePostPublishStatus(id: string, published: boolean) {
     }
 }
 
-// Pagination action
-export async function fetchPosts(page: number, limit: number) {
+// Cursor-based pagination action for infinite scroll
+export async function fetchPosts(cursor: { createdAt: string; id: string } | null, limit: number) {
     try {
         const posts = await prisma.post.findMany({
             where: { published: true },
-            orderBy: { createdAt: 'desc' },
+            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
             take: limit,
-            skip: (page - 1) * limit,
+            ...(cursor ? {
+                skip: 1, // Skip the cursor itself
+                cursor: { id: cursor.id },
+            } : {}),
+            select: {
+                id: true,
+                slug: true,
+                title: true,
+                excerpt: true,
+                tags: true,
+                createdAt: true,
+                updatedAt: true,
+                published: true,
+            },
         });
         return posts;
     } catch (_error) {

@@ -2,19 +2,32 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Post } from '@prisma/client';
 import { fetchPosts } from '@/app/actions';
 import Spinner from './Spinner';
 
 type ViewMode = 'grid' | 'list';
 
+/** Lightweight post type for list views (excludes heavy content fields) */
+export interface PostListItem {
+    id: string;
+    slug: string;
+    title: string;
+    excerpt: string;
+    tags: string;
+    createdAt: Date;
+    updatedAt: Date;
+    published: boolean;
+}
+
 interface PostListProps {
-    posts: Post[];
+    posts: PostListItem[];
     showToggle?: boolean;
     headerContent?: React.ReactNode;
     footerContent?: React.ReactNode;
     enableInfiniteScroll?: boolean;
 }
+
+const POSTS_PER_PAGE = 12;
 
 export default function PostList({
     posts: initialPosts,
@@ -23,48 +36,55 @@ export default function PostList({
     footerContent,
     enableInfiniteScroll = false,
 }: PostListProps) {
-    const [posts, setPosts] = useState<Post[]>(initialPosts);
+    const [posts, setPosts] = useState<PostListItem[]>(initialPosts);
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [visiblePosts, setVisiblePosts] = useState<Set<string>>(new Set());
     const [footerVisible, setFooterVisible] = useState(false);
     const [headerVisible, setHeaderVisible] = useState(false);
 
-    // Pagination state
-    const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(false);
+    // Cursor-based pagination state
     const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const fetchingRef = useRef(false); // Guard against duplicate fetches
     const observerTarget = useRef<HTMLDivElement>(null);
 
     // Initial check for hasMore
     useEffect(() => {
-        if (!enableInfiniteScroll || initialPosts.length < 12) {
+        if (!enableInfiniteScroll || initialPosts.length < POSTS_PER_PAGE) {
             setHasMore(false);
         }
     }, [initialPosts, enableInfiniteScroll]);
 
-    // Infinite Scroll Observer
+    // Infinite Scroll Observer with cursor-based pagination
     useEffect(() => {
         if (!enableInfiniteScroll) return;
 
         const observer = new IntersectionObserver(
             async (entries) => {
-                if (entries[0].isIntersecting && hasMore && !loading) {
+                if (entries[0].isIntersecting && hasMore && !loading && !fetchingRef.current) {
+                    fetchingRef.current = true;
                     setLoading(true);
                     try {
-                        const nextPosts = await fetchPosts(page + 1, 12);
+                        // Use the last post as cursor
+                        const lastPost = posts[posts.length - 1];
+                        const cursor = lastPost
+                            ? { createdAt: new Date(lastPost.createdAt).toISOString(), id: lastPost.id }
+                            : null;
 
-                        if (nextPosts.length < 12) {
+                        const nextPosts = await fetchPosts(cursor, POSTS_PER_PAGE);
+
+                        if (nextPosts.length < POSTS_PER_PAGE) {
                             setHasMore(false);
                         }
 
                         if (nextPosts.length > 0) {
                             setPosts((prev) => [...prev, ...nextPosts]);
-                            setPage((prev) => prev + 1);
                         }
                     } catch (_error) {
                         // Error loading posts - fail silently
                     } finally {
                         setLoading(false);
+                        fetchingRef.current = false;
                     }
                 }
             },
@@ -76,7 +96,7 @@ export default function PostList({
         }
 
         return () => observer.disconnect();
-    }, [page, loading, hasMore, enableInfiniteScroll]);
+    }, [posts, loading, hasMore, enableInfiniteScroll]);
 
     // Observer for posts visibility animation
     useEffect(() => {

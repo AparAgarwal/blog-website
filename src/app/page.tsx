@@ -54,39 +54,46 @@ export const metadata: Metadata = {
 
 async function getHomePageData() {
     try {
-        // Query featured post separately to ensure it's always found
-        const featuredPost = await prisma.post.findFirst({
-            where: {
-                published: true,
-                tags: {
-                    contains: 'Featured',
-                    mode: 'insensitive',
-                },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+        const pinnedSlug = 'building-a-modern-blog-platform-with-vibe-coding';
+        const selectFields = {
+            id: true,
+            slug: true,
+            title: true,
+            excerpt: true,
+            tags: true,
+            createdAt: true,
+            updatedAt: true,
+            published: true,
+        } as const;
 
-        // Get recent posts for home page
-        const posts = await prisma.post.findMany({
-            where: { published: true },
-            orderBy: { createdAt: 'desc' },
-            take: 6,
-        });
+        // Parallel queries: pinned post (single row by unique slug) + recent posts
+        const [pinnedPost, posts] = await Promise.all([
+            prisma.post.findUnique({
+                where: { slug: pinnedSlug },
+                select: selectFields,
+            }),
+            prisma.post.findMany({
+                where: { published: true },
+                orderBy: { createdAt: 'desc' },
+                take: 6,
+                select: selectFields,
+            }),
+        ]);
 
-        // Build featured topics with featured post always first
+        // Build featured topics with pinned post always first
         const featuredTopics = [];
 
-        if (featuredPost) {
+        if (pinnedPost?.published) {
             featuredTopics.push({
-                text: featuredPost.title,
-                href: `/posts/${featuredPost.slug}`,
+                text: pinnedPost.title,
+                href: `/posts/${pinnedPost.slug}`,
             });
         }
 
-        // Add other recent posts to fill remaining slots (up to 3 total)
+        // Add recent posts to fill remaining slots (up to 3 total)
         const remainingSlots = 3 - featuredTopics.length;
         posts
-            .filter((p) => p.id !== featuredPost?.id)
+            .filter((p) => p.id !== pinnedPost?.id)
             .slice(0, remainingSlots)
             .forEach((p) => {
                 featuredTopics.push({
