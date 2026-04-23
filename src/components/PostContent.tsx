@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import mediumZoom from 'medium-zoom';
 
 interface PostContentProps {
     html: string;
@@ -83,6 +84,22 @@ export default function PostContent({ html }: PostContentProps) {
             wrapper.appendChild(btnContainer);
             wrapper.appendChild(pre);
         });
+
+        // Initialize medium-zoom for images inside the content
+        const images = containerRef.current.querySelectorAll('img');
+        let zoom: ReturnType<typeof mediumZoom> | null = null;
+        if (images.length > 0) {
+            zoom = mediumZoom(images, {
+                margin: 24,
+                background: 'var(--bg-primary)',
+            });
+        }
+
+        return () => {
+            if (zoom) {
+                zoom.detach();
+            }
+        };
     }, [html]);
 
     return (

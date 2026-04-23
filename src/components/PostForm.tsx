@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import mediumZoom from 'medium-zoom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Post } from '@prisma/client';
@@ -33,6 +34,7 @@ export default function PostForm({ post }: { post?: Post }) {
     const [prevPostValue, setPrevPostValue] = useState(getInitialNavValue(post?.prevNavConfig, post?.prevPostId));
     const [nextPostValue, setNextPostValue] = useState(getInitialNavValue(post?.nextNavConfig, post?.nextPostId));
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const previewRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
     // Load initial posts (limited)
@@ -41,6 +43,22 @@ export default function PostForm({ post }: { post?: Post }) {
             setAvailablePosts(posts.filter((p) => p.id !== post?.id));
         });
     }, [post?.id]);
+
+    // Setup image zoom for preview pane
+    useEffect(() => {
+        if (!previewRef.current) return;
+        const images = previewRef.current.querySelectorAll('img');
+        let zoom: ReturnType<typeof mediumZoom> | null = null;
+        if (images.length > 0) {
+            zoom = mediumZoom(images, {
+                margin: 24,
+                background: 'var(--bg-primary)',
+            });
+        }
+        return () => {
+            if (zoom) zoom.detach();
+        };
+    }, [content, activeTab]);
 
     // Memoize nav options to avoid recreating on every render
     const navOptions = useMemo(
@@ -384,7 +402,7 @@ export default function PostForm({ post }: { post?: Post }) {
                     <div className="preview-header">
                         <div className="header-title">Live Preview</div>
                     </div>
-                    <div className="markdown-preview post-content">
+                    <div ref={previewRef} className="markdown-preview post-content">
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkMath]}
                             rehypePlugins={[rehypeKatex]}
