@@ -29,6 +29,20 @@ function rehypeWrapTables() {
 }
 
 /**
+ * Rehype plugin to open all links in a new tab.
+ */
+function rehypeExternalLinks() {
+    return (tree: Root) => {
+        visit(tree, 'element', (node: Element) => {
+            if (node.tagName === 'a' && node.properties?.href) {
+                node.properties.target = '_blank';
+                node.properties.rel = 'noopener noreferrer';
+            }
+        });
+    };
+}
+
+/**
  * Pre-compiles markdown/MDX content to HTML using the same remark/rehype
  * pipeline as the MDXRemote component, but produces a static HTML string
  * that can be stored in the database and served without re-compilation.
@@ -51,6 +65,7 @@ export async function compileMarkdownToHtml(source: string): Promise<string> {
             keepBackground: false,
         })
         .use(rehypeWrapTables)
+        .use(rehypeExternalLinks)
         .use(rehypeStringify, { allowDangerousHtml: true })
         .process(source);
 
