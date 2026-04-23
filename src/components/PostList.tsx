@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { fetchPosts } from '@/app/actions';
-import Spinner from './Spinner';
 
 type ViewMode = 'grid' | 'list';
 
@@ -24,79 +22,20 @@ interface PostListProps {
     showToggle?: boolean;
     headerContent?: React.ReactNode;
     footerContent?: React.ReactNode;
-    enableInfiniteScroll?: boolean;
 }
 
 const POSTS_PER_PAGE = 12;
 
 export default function PostList({
-    posts: initialPosts,
+    posts,
     showToggle = true,
     headerContent,
     footerContent,
-    enableInfiniteScroll = false,
 }: PostListProps) {
-    const [posts, setPosts] = useState<PostListItem[]>(initialPosts);
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [visiblePosts, setVisiblePosts] = useState<Set<string>>(new Set());
     const [footerVisible, setFooterVisible] = useState(false);
     const [headerVisible, setHeaderVisible] = useState(false);
-
-    // Cursor-based pagination state
-    const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const fetchingRef = useRef(false); // Guard against duplicate fetches
-    const observerTarget = useRef<HTMLDivElement>(null);
-
-    // Initial check for hasMore
-    useEffect(() => {
-        if (!enableInfiniteScroll || initialPosts.length < POSTS_PER_PAGE) {
-            setHasMore(false);
-        }
-    }, [initialPosts, enableInfiniteScroll]);
-
-    // Infinite Scroll Observer with cursor-based pagination
-    useEffect(() => {
-        if (!enableInfiniteScroll) return;
-
-        const observer = new IntersectionObserver(
-            async (entries) => {
-                if (entries[0].isIntersecting && hasMore && !loading && !fetchingRef.current) {
-                    fetchingRef.current = true;
-                    setLoading(true);
-                    try {
-                        // Use the last post as cursor
-                        const lastPost = posts[posts.length - 1];
-                        const cursor = lastPost
-                            ? { createdAt: new Date(lastPost.createdAt).toISOString(), id: lastPost.id }
-                            : null;
-
-                        const nextPosts = await fetchPosts(cursor, POSTS_PER_PAGE);
-
-                        if (nextPosts.length < POSTS_PER_PAGE) {
-                            setHasMore(false);
-                        }
-
-                        if (nextPosts.length > 0) {
-                            setPosts((prev) => [...prev, ...nextPosts]);
-                        }
-                    } catch (_error) {
-                        // Error loading posts - fail silently
-                    } finally {
-                        setLoading(false);
-                        fetchingRef.current = false;
-                    }
-                }
-            },
-            { threshold: 0.1 }
-        );
-
-        if (observerTarget.current) {
-            observer.observe(observerTarget.current);
-        }
-
-        return () => observer.disconnect();
-    }, [posts, loading, hasMore, enableInfiniteScroll]);
 
     // Observer for posts visibility animation
     useEffect(() => {
@@ -263,21 +202,6 @@ export default function PostList({
                 })}
             </div>
 
-            {/* Infinite scroll trigger and loading state */}
-            {hasMore && <div ref={observerTarget} style={{ height: '20px', margin: '40px 0' }} />}
-
-            {loading && (
-                <div
-                    style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}
-                    role="status"
-                    aria-live="polite"
-                    aria-label="Loading more posts"
-                >
-                    <Spinner size={40} color="var(--text-tertiary)" borderWidth={3} />
-                    <span className="sr-only">Loading more posts...</span>
-                </div>
-            )}
-
             {/* Footer content - View All button for home, End of content for archive */}
             {footerContent && (
                 <div
@@ -285,13 +209,6 @@ export default function PostList({
                     className={`view-all-btn-anim ${footerVisible ? 'visible' : ''} ${footerVisible ? 'hero-delay-view-all' : ''}`}
                 >
                     {footerContent}
-                </div>
-            )}
-
-            {/* End of content message for archive page only */}
-            {!hasMore && !footerContent && posts.length > 0 && (
-                <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
-                    <p style={{ fontSize: '16px', fontFamily: 'Outfit, sans-serif' }}>— End of content —</p>
                 </div>
             )}
         </>

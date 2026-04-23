@@ -46,27 +46,48 @@ export const metadata: Metadata = {
     },
 };
 
-async function getAllPosts() {
-    const posts = await prisma.post.findMany({
-        where: { published: true },
-        orderBy: { createdAt: 'desc' },
-        take: 12, // Initial limit for pagination
-        select: {
-            id: true,
-            slug: true,
-            title: true,
-            excerpt: true,
-            tags: true,
-            createdAt: true,
-            updatedAt: true,
-            published: true,
-        },
-    });
-    return posts;
+async function getPostsData(page: number) {
+    const limit = 24;
+    const skip = (page - 1) * limit;
+
+    const [posts, total] = await Promise.all([
+        prisma.post.findMany({
+            where: { published: true },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+            select: {
+                id: true,
+                slug: true,
+                title: true,
+                excerpt: true,
+                tags: true,
+                createdAt: true,
+                updatedAt: true,
+                published: true,
+            },
+        }),
+        prisma.post.count({ where: { published: true } })
+    ]);
+
+    return { posts, total, totalPages: Math.ceil(total / limit) };
 }
 
-export default async function ArchivePage() {
-    const posts = await getAllPosts();
+type Props = {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined };
+};
+
+export default async function ArchivePage(props: Props) {
+    let pageString = '1';
+
+    // Handle Next.js 15+ Async SearchParams if applicable
+    const searchParams = await props.searchParams;
+    if (typeof searchParams?.page === 'string') {
+        pageString = searchParams.page;
+    }
+
+    const page = Math.max(1, parseInt(pageString) || 1);
+    const { posts, totalPages } = await getPostsData(page);
 
     const headerContent = (
         <div className="archive-hero-content">
@@ -75,10 +96,48 @@ export default async function ArchivePage() {
         </div>
     );
 
+    const paginationControls = totalPages > 1 && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '80px', padding: '40px 0 0px' }}>
+            {page === totalPages && (
+                <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '50%', left: '-100px', right: '-100px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--border-color), transparent)', zIndex: 0 }}></div>
+                    <p style={{ position: 'relative', zIndex: 1, background: 'var(--bg-primary)', display: 'inline-block', padding: '0 20px', fontSize: '0.9rem', letterSpacing: '2px', textTransform: 'uppercase' }}>
+                        — End of Archive —
+                    </p>
+                </div>
+            )}
+            <div className="pagination">
+                {page > 1 ? (
+                    <a href={`/archive?page=${page - 1}`} className="view-all-btn pagination-btn">
+                        &larr; Newer Posts
+                    </a>
+                ) : (
+                    <span className="view-all-btn pagination-btn disabled">
+                        &larr; Newer Posts
+                    </span>
+                )}
+
+                <span className="pagination-info">
+                    PAGE {page} OF {totalPages}
+                </span>
+
+                {page < totalPages ? (
+                    <a href={`/archive?page=${page + 1}`} className="view-all-btn pagination-btn">
+                        Older Posts &rarr;
+                    </a>
+                ) : (
+                    <span className="view-all-btn pagination-btn disabled">
+                        Older Posts &rarr;
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+
     return (
         <div className="archive-hero">
             <div className="posts-section archive-posts">
-                <PostList posts={posts} headerContent={headerContent} enableInfiniteScroll={true} />
+                <PostList posts={posts} headerContent={headerContent} footerContent={paginationControls} />
             </div>
         </div>
     );

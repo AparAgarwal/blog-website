@@ -7,7 +7,13 @@ import { authOptions } from '@/auth.config';
 import { z, ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { notifySearchEngine } from '@/lib/google-indexing';
+function pingSitemaps() {
+    if (!process.env.SITE_URL) return;
+    const sitemapUrl = `${process.env.SITE_URL}/sitemap.xml`;
+    // Standard basic SEO ping to notify search engines about sitemap changes
+    fetch(`https://www.google.com/ping?sitemap=${sitemapUrl}`).catch(console.error);
+    fetch(`https://www.bing.com/ping?sitemap=${sitemapUrl}`).catch(console.error);
+}
 import { compileMarkdownToHtml } from '@/lib/mdx-compiler';
 
 const PostSchema = z.object({
@@ -112,11 +118,9 @@ export async function createPost(prevState: FormState | null, formData: FormData
             data: { ...validatedData, compiledContent },
         });
 
-        // Notify Google Indexing API
-        if (validatedData.published && process.env.SITE_URL) {
-            notifySearchEngine(`${process.env.SITE_URL}/posts/${validatedData.slug}`, 'URL_UPDATED').catch(
-                console.error
-            );
+        // Notify Search Engines to crawl sitemap
+        if (validatedData.published) {
+            pingSitemaps();
         }
 
         revalidatePath('/admin');
@@ -233,22 +237,8 @@ export async function updatePost(prevState: FormState | null, formData: FormData
             data: updateData,
         });
 
-        // Notify Google Indexing API
-        if (process.env.SITE_URL) {
-            const newUrl = `${process.env.SITE_URL}/posts/${validatedData.slug}`;
-
-            // If slug changed, remove old URL
-            if (existingPost && existingPost.slug !== validatedData.slug) {
-                const oldUrl = `${process.env.SITE_URL}/posts/${existingPost.slug}`;
-                notifySearchEngine(oldUrl, 'URL_DELETED').catch(console.error);
-            }
-
-            if (validatedData.published) {
-                notifySearchEngine(newUrl, 'URL_UPDATED').catch(console.error);
-            } else {
-                notifySearchEngine(newUrl, 'URL_DELETED').catch(console.error);
-            }
-        }
+        // Notify Search Engines if a relevant publish/slug change occurred
+        pingSitemaps();
 
         revalidatePath('/admin');
         revalidatePath('/');
@@ -300,12 +290,8 @@ export async function deletePost(id: string) {
         // Delete the post (cascade will set foreign keys to null)
         await prisma.post.delete({ where: { id } });
 
-        // Notify Google Indexing API
-        if (postToDelete && process.env.SITE_URL) {
-            notifySearchEngine(`${process.env.SITE_URL}/posts/${postToDelete.slug}`, 'URL_DELETED').catch(
-                console.error
-            );
-        }
+        // Re-ping sitemap after deletion
+        pingSitemaps();
 
         revalidatePath('/admin');
         revalidatePath('/');
@@ -328,15 +314,8 @@ export async function togglePostPublishStatus(id: string, published: boolean) {
             data: { published },
         });
 
-        // Notify Google Indexing API
-        if (process.env.SITE_URL) {
-            const url = `${process.env.SITE_URL}/posts/${post.slug}`;
-            if (published) {
-                notifySearchEngine(url, 'URL_UPDATED').catch(console.error);
-            } else {
-                notifySearchEngine(url, 'URL_DELETED').catch(console.error);
-            }
-        }
+        // Notify search engines
+        pingSitemaps();
 
         revalidatePath('/admin');
         revalidatePath('/');
@@ -351,33 +330,7 @@ export async function togglePostPublishStatus(id: string, published: boolean) {
     }
 }
 
-// Cursor-based pagination action for infinite scroll
-export async function fetchPosts(cursor: { createdAt: string; id: string } | null, limit: number) {
-    try {
-        const posts = await prisma.post.findMany({
-            where: { published: true },
-            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-            take: limit,
-            ...(cursor ? {
-                skip: 1, // Skip the cursor itself
-                cursor: { id: cursor.id },
-            } : {}),
-            select: {
-                id: true,
-                slug: true,
-                title: true,
-                excerpt: true,
-                tags: true,
-                createdAt: true,
-                updatedAt: true,
-                published: true,
-            },
-        });
-        return posts;
-    } catch (_error) {
-        return [];
-    }
-}
+
 
 // Get all posts for select dropdown with optional search and limit
 export async function getAllPostsForSelect(searchTerm?: string, limit?: number) {

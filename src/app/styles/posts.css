@@ -764,3 +764,49 @@
     overflow-x: auto;
     overflow-y: hidden;
 }
+
+/* ============================================
+   Pagination Styles
+   ============================================ */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--font-outfit), sans-serif;
+    width: 100%;
+}
+
+.pagination-btn.pagination-btn {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+}
+
+.pagination-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-info {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .pagination {
+        gap: 10px;
+    }
+
+    .pagination-btn.pagination-btn {
+        padding: 8px 14px;
+        font-size: 3vw;
+    }
+
+    .pagination-info {
+        font-size: 2.7vw;
+    }
+}

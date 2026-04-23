@@ -107,12 +107,9 @@ export const metadata: Metadata = {
         },
     },
     verification: {
-        // TODO: Add your Google Search Console verification code
-        // google: 'your-google-verification-code',
-        // TODO: Add your Bing Webmaster Tools verification code
-        // other: {
-        //     'msvalidate.01': 'your-bing-verification-code',
-        // },
+        ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? {
+            google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+        } : {}),
     },
     appleWebApp: {
         capable: true,
