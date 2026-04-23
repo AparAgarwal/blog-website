@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Borel, Comfortaa, Outfit } from 'next/font/google';
 import './globals.css';
+import 'katex/dist/katex.min.css';
 import RootLayoutClient from './layout-client';
 import { getOrganizationSchema, getWebsiteSchema } from '@/lib/seo';
 import { SpeedInsights } from '@vercel/speed-insights/next';

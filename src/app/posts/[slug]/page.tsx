@@ -6,6 +6,8 @@ import type { ComponentProps } from 'react';
 import prisma from '@/lib/db';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import rehypePrettyCode from 'rehype-pretty-code';
 import CodeBlock from '@/components/CodeBlock';
 import PostContent from '@/components/PostContent';
@@ -315,8 +317,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                         source={post.content}
                         options={{
                             mdxOptions: {
-                                remarkPlugins: [remarkGfm],
+                                remarkPlugins: [remarkGfm, remarkMath],
                                 rehypePlugins: [
+                                    rehypeKatex,
                                     [
                                         rehypePrettyCode,
                                         {

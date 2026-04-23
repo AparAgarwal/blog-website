@@ -738,3 +738,13 @@
 .nav-link:hover .nav-title-wrapper::after {
     transform: scaleX(1);
 }
+
+/* ============================================
+   Katex Math Block Styling
+   ============================================ */
+.katex-display {
+    text-align: center;
+    margin: 2em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}

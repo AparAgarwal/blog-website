@@ -2,6 +2,8 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeStringify from 'rehype-stringify';
 import type { Root, Element } from 'hast';
@@ -38,7 +40,9 @@ export async function compileMarkdownToHtml(source: string): Promise<string> {
     const result = await unified()
         .use(remarkParse)
         .use(remarkGfm)
+        .use(remarkMath)
         .use(remarkRehype, { allowDangerousHtml: true })
+        .use(rehypeKatex)
         .use(rehypePrettyCode, {
             theme: {
                 dark: 'dark-plus',
