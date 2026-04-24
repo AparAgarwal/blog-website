@@ -13,6 +13,7 @@ export async function GET() {
         select: {
             slug: true,
             title: true,
+            excerpt: true,
             content: true,
             createdAt: true,
             updatedAt: true,
@@ -30,7 +31,7 @@ export async function GET() {
         <guid isPermaLink="true">${baseUrl}/posts/${post.slug}</guid>
         <pubDate>${post.createdAt.toUTCString()}</pubDate>
         <lastBuildDate>${post.updatedAt.toUTCString()}</lastBuildDate>
-        <description>${escapeXml(post.content.substring(0, 300))}...</description>
+        <description>${escapeXml(post.excerpt || post.content.substring(0, 300))}...</description>
         <content:encoded><![CDATA[${post.content}]]></content:encoded>
         ${
             post.tags

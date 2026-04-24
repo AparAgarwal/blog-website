@@ -43,6 +43,7 @@ const getPostData = cache(async (slug: string) => {
             id: true,
             slug: true,
             title: true,
+            excerpt: true,
             content: true,
             compiledContent: true,
             published: true,
@@ -80,6 +81,7 @@ const getPostData = cache(async (slug: string) => {
                         id: true,
                         slug: true,
                         title: true,
+                        excerpt: true,
                         content: true,
                         compiledContent: true,
                         published: true,
@@ -157,7 +159,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 
     const { post } = data;
-    const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
+    const description = post.excerpt || post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
     const publishedTime = post.createdAt.toISOString();
     const modifiedTime = post.updatedAt.toISOString();
     const postUrl = `${baseUrl}/posts/${post.slug}`;
@@ -215,7 +217,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     if (slug !== post.slug) {
         redirect(`/posts/${post.slug}`);
     }
-    const description = post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
+    const description = post.excerpt || post.content.substring(0, 160).replace(/[#*`[\]]/g, '') + '...';
 
     // Generate JSON-LD structured data using centralized schema
     const jsonLd = getBlogPostingSchema(
