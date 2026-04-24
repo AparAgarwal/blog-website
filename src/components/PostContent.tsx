@@ -102,11 +102,5 @@ export default function PostContent({ html }: PostContentProps) {
         };
     }, [html]);
 
-    return (
-        <div
-            ref={containerRef}
-            className="post-content"
-            dangerouslySetInnerHTML={{ __html: html }}
-        />
-    );
+    return <div ref={containerRef} className="post-content" dangerouslySetInnerHTML={{ __html: html }} />;
 }

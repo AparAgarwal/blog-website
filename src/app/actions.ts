@@ -228,9 +228,7 @@ export async function updatePost(prevState: FormState | null, formData: FormData
             }
         }
 
-        const updateData = compiledContent !== null
-            ? { ...validatedData, compiledContent }
-            : validatedData;
+        const updateData = compiledContent !== null ? { ...validatedData, compiledContent } : validatedData;
 
         await prisma.post.update({
             where: { id },
@@ -329,8 +327,6 @@ export async function togglePostPublishStatus(id: string, published: boolean) {
         return { success: false, message: 'Failed to update post status' };
     }
 }
-
-
 
 // Get all posts for select dropdown with optional search and limit
 export async function getAllPostsForSelect(searchTerm?: string, limit?: number) {

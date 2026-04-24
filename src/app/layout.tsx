@@ -107,9 +107,11 @@ export const metadata: Metadata = {
         },
     },
     verification: {
-        ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? {
-            google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-        } : {}),
+        ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+            ? {
+                  google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+              }
+            : {}),
     },
     appleWebApp: {
         capable: true,

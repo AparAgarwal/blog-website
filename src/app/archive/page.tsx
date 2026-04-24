@@ -67,14 +67,16 @@ async function getPostsData(page: number) {
                 published: true,
             },
         }),
-        prisma.post.count({ where: { published: true } })
+        prisma.post.count({ where: { published: true } }),
     ]);
 
     return { posts, total, totalPages: Math.ceil(total / limit) };
 }
 
 type Props = {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined };
+    searchParams:
+        | Promise<{ [key: string]: string | string[] | undefined }>
+        | { [key: string]: string | string[] | undefined };
 };
 
 export default async function ArchivePage(props: Props) {
@@ -97,11 +99,40 @@ export default async function ArchivePage(props: Props) {
     );
 
     const paginationControls = totalPages > 1 && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '80px', padding: '40px 0 0px' }}>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '80px',
+                padding: '40px 0 0px',
+            }}
+        >
             {page === totalPages && (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', position: 'relative' }}>
-                    <div style={{ position: 'absolute', top: '50%', left: '-100px', right: '-100px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--border-color), transparent)', zIndex: 0 }}></div>
-                    <p style={{ position: 'relative', zIndex: 1, background: 'var(--bg-primary)', display: 'inline-block', padding: '0 20px', fontSize: '0.9rem', letterSpacing: '2px', textTransform: 'uppercase' }}>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '-100px',
+                            right: '-100px',
+                            height: '1px',
+                            background: 'linear-gradient(90deg, transparent, var(--border-color), transparent)',
+                            zIndex: 0,
+                        }}
+                    ></div>
+                    <p
+                        style={{
+                            position: 'relative',
+                            zIndex: 1,
+                            background: 'var(--bg-primary)',
+                            display: 'inline-block',
+                            padding: '0 20px',
+                            fontSize: '0.9rem',
+                            letterSpacing: '2px',
+                            textTransform: 'uppercase',
+                        }}
+                    >
                         — End of Archive —
                     </p>
                 </div>
@@ -112,9 +143,7 @@ export default async function ArchivePage(props: Props) {
                         &larr; Newer Posts
                     </a>
                 ) : (
-                    <span className="view-all-btn pagination-btn disabled">
-                        &larr; Newer Posts
-                    </span>
+                    <span className="view-all-btn pagination-btn disabled">&larr; Newer Posts</span>
                 )}
 
                 <span className="pagination-info">
@@ -126,9 +155,7 @@ export default async function ArchivePage(props: Props) {
                         Older Posts &rarr;
                     </a>
                 ) : (
-                    <span className="view-all-btn pagination-btn disabled">
-                        Older Posts &rarr;
-                    </span>
+                    <span className="view-all-btn pagination-btn disabled">Older Posts &rarr;</span>
                 )}
             </div>
         </div>

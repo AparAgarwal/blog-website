@@ -26,12 +26,7 @@ interface PostListProps {
 
 const POSTS_PER_PAGE = 12;
 
-export default function PostList({
-    posts,
-    showToggle = true,
-    headerContent,
-    footerContent,
-}: PostListProps) {
+export default function PostList({ posts, showToggle = true, headerContent, footerContent }: PostListProps) {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [visiblePosts, setVisiblePosts] = useState<Set<string>>(new Set());
     const [footerVisible, setFooterVisible] = useState(false);
