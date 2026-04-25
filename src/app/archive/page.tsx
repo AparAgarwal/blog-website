@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import prisma from '@/lib/db';
-import PostList from '@/components/PostList';
+import ArchiveClient from './ArchiveClient';
 
 // Revalidate every 5 minutes
 export const revalidate = 300;
@@ -82,11 +82,11 @@ type Props = {
 export default async function ArchivePage(props: Props) {
     let pageString = '1';
 
-    // Handle Next.js 15+ Async SearchParams if applicable
     const searchParams = await props.searchParams;
     if (typeof searchParams?.page === 'string') {
         pageString = searchParams.page;
     }
+    const query = typeof searchParams?.q === 'string' ? searchParams.q : '';
 
     const page = Math.max(1, parseInt(pageString) || 1);
     const { posts, totalPages } = await getPostsData(page);
@@ -164,7 +164,12 @@ export default async function ArchivePage(props: Props) {
     return (
         <div className="archive-hero">
             <div className="posts-section archive-posts">
-                <PostList posts={posts} headerContent={headerContent} footerContent={paginationControls} />
+                <ArchiveClient
+                    initialPosts={posts}
+                    headerContent={headerContent}
+                    paginationControls={paginationControls}
+                    query={query}
+                />
             </div>
         </div>
     );
