@@ -22,11 +22,18 @@ interface PostListProps {
     showToggle?: boolean;
     headerContent?: React.ReactNode;
     footerContent?: React.ReactNode;
+    searchComponent?: React.ReactNode;
 }
 
 const POSTS_PER_PAGE = 12;
 
-export default function PostList({ posts, showToggle = true, headerContent, footerContent }: PostListProps) {
+export default function PostList({
+    posts,
+    showToggle = true,
+    headerContent,
+    footerContent,
+    searchComponent,
+}: PostListProps) {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [visiblePosts, setVisiblePosts] = useState<Set<string>>(new Set());
     const [footerVisible, setFooterVisible] = useState(false);
@@ -96,54 +103,57 @@ export default function PostList({ posts, showToggle = true, headerContent, foot
                 className={`posts-header-container ${headerVisible ? 'visible' : ''} ${headerVisible ? 'hero-delay-header' : ''}`}
             >
                 <div className="posts-header-content">{headerContent}</div>
-                {showToggle && (
-                    <div className="view-toggle-container">
-                        <button
-                            onClick={() => setViewMode('grid')}
-                            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                            aria-label="Grid View"
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                <div className="posts-header-controls">
+                    {searchComponent}
+                    {showToggle && (
+                        <div className="view-toggle-container">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                aria-label="Grid View"
                             >
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                        </button>
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                            aria-label="List View"
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                aria-label="List View"
                             >
-                                <line x1="8" y1="6" x2="21" y2="6"></line>
-                                <line x1="8" y1="12" x2="21" y2="12"></line>
-                                <line x1="8" y1="18" x2="21" y2="18"></line>
-                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                )}
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className={`container post-container ${viewMode === 'list' ? 'list-view' : ''}`} id="posts-container">
@@ -195,6 +205,31 @@ export default function PostList({ posts, showToggle = true, headerContent, foot
                         </article>
                     );
                 })}
+                {posts.length === 0 && (
+                    <div className="search-empty-state">
+                        <div className="search-empty-icon">
+                            <svg
+                                width="64"
+                                height="64"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <line x1="8" y1="8" x2="14" y2="14"></line>
+                                <line x1="14" y1="8" x2="8" y2="14"></line>
+                            </svg>
+                        </div>
+                        <h2 className="search-empty-title">No results found</h2>
+                        <p className="search-empty-subtitle">
+                            We couldn't find any posts matching your search. Try different keywords or check for typos.
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Footer content - View All button for home, End of content for archive */}

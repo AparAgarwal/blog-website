@@ -16,6 +16,7 @@
 /* Page Sections */
 @import './styles/sections.css';
 @import './styles/posts.css';
+@import './styles/search.css';
 
 /* Forms & Admin */
 @import './styles/forms.css';
