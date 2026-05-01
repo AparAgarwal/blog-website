@@ -25,14 +25,21 @@ const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 // Generate static params for all published posts
 export async function generateStaticParams() {
-    const posts = await prisma.post.findMany({
-        where: { published: true },
-        select: { slug: true },
-    });
+    try {
+        const posts = await prisma.post.findMany({
+            where: { published: true },
+            select: { slug: true },
+        });
 
-    return posts.map((post) => ({
-        slug: post.slug,
-    }));
+        return posts.map((post) => ({
+            slug: post.slug,
+        }));
+    } catch (error) {
+        // If database is unavailable during build, return empty array
+        // Posts will be generated on-demand since dynamicParams = true
+        console.warn('Could not generate static params for posts, will use on-demand ISR:', error);
+        return [];
+    }
 }
 
 const getPostData = cache(async (slug: string) => {
