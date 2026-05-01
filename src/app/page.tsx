@@ -54,7 +54,6 @@ export const metadata: Metadata = {
 
 async function getHomePageData() {
     try {
-        const pinnedSlug = 'building-a-modern-blog-platform-with-vibe-coding';
         const selectFields = {
             id: true,
             slug: true,
@@ -64,46 +63,45 @@ async function getHomePageData() {
             createdAt: true,
             updatedAt: true,
             published: true,
-        } as const;
+        };
 
-        // Parallel queries: pinned post (single row by unique slug) + recent posts
-        const [pinnedPost, posts] = await Promise.all([
-            prisma.post.findUnique({
-                where: { slug: pinnedSlug },
-                select: selectFields,
-            }),
-            prisma.post.findMany({
-                where: { published: true },
-                orderBy: { createdAt: 'desc' },
-                take: 6,
-                select: selectFields,
-            }),
-        ]);
+        const featuredPosts = await prisma.post.findMany({
+            where: {
+                published: true,
+                tags: {
+                    contains: 'featured',
+                    mode: 'insensitive',
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 3,
+            select: selectFields,
+        });
 
-        // Build featured topics with pinned post always first
-        const featuredTopics = [];
+        const posts = await prisma.post.findMany({
+            where: { published: true },
+            orderBy: { createdAt: 'desc' },
+            take: 6,
+            select: selectFields,
+        });
 
-        if (pinnedPost?.published) {
-            featuredTopics.push({
-                text: pinnedPost.title,
-                href: `/posts/${pinnedPost.slug}`,
-            });
+        // Build hero topics from featured-tag posts first, then fill with recent posts.
+        const topicSource = [...featuredPosts];
+        for (const post of posts) {
+            if (topicSource.length >= 3) break;
+            if (!topicSource.some((p) => p.id === post.id)) {
+                topicSource.push(post);
+            }
         }
 
-        // Add recent posts to fill remaining slots (up to 3 total)
-        const remainingSlots = 3 - featuredTopics.length;
-        posts
-            .filter((p) => p.id !== pinnedPost?.id)
-            .slice(0, remainingSlots)
-            .forEach((p) => {
-                featuredTopics.push({
-                    text: p.title,
-                    href: `/posts/${p.slug}`,
-                });
-            });
+        const featuredTopics = topicSource.slice(0, 3).map((post) => ({
+            text: post.title,
+            href: `/posts/${post.slug}`,
+        }));
 
         return { posts, featuredTopics };
-    } catch (_error) {
+    } catch (error) {
+        console.error('Error fetching home page data:', error);
         // Error logged on server, return empty data to prevent crash
         return { posts: [], featuredTopics: [] };
     }
