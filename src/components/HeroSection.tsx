@@ -1,15 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import BreakingText from './BreakingText';
 
-export interface Topic {
-    href: string;
-    text: string;
-}
-
-export default function HeroSection({ topics }: { topics: Topic[] }) {
+export default function HeroSection({ children }: { children?: React.ReactNode }) {
     const sectionRef = useRef<HTMLElement>(null);
     const [animationClass, setAnimationClass] = useState('');
 
@@ -55,20 +49,7 @@ export default function HeroSection({ topics }: { topics: Topic[] }) {
                     completeness.
                 </p>
 
-                <nav className="featured-topics" aria-label="Featured topics">
-                    <ul className="topics-list" role="list">
-                        {topics.map((topic, index) => (
-                            <li className="topic-item" key={index} role="listitem">
-                                <Link href={topic.href} className="contents" aria-label={`Read about ${topic.text}`}>
-                                    <span className="topic-marker" aria-hidden="true">
-                                        [ ]
-                                    </span>
-                                    <span className="topic-text">{topic.text}</span>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                {children}
             </div>
         </section>
     );

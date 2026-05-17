@@ -1,8 +1,12 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import prisma from '@/lib/db';
 import PostList from '@/components/PostList';
 import HeroSection from '@/components/HeroSection';
+import FeaturedTopics from '@/components/FeaturedTopics';
+import TopicsSkeleton from '@/components/skeletons/TopicsSkeleton';
+import PostCardsSkeleton from '@/components/skeletons/PostCardsSkeleton';
 
 // Revalidate every 5 minutes (300 seconds)
 export const revalidate = 300;
@@ -52,19 +56,23 @@ export const metadata: Metadata = {
     },
 };
 
-async function getHomePageData() {
-    try {
-        const selectFields = {
-            id: true,
-            slug: true,
-            title: true,
-            excerpt: true,
-            tags: true,
-            createdAt: true,
-            updatedAt: true,
-            published: true,
-        };
+const selectFields = {
+    id: true,
+    slug: true,
+    title: true,
+    excerpt: true,
+    tags: true,
+    createdAt: true,
+    updatedAt: true,
+    published: true,
+};
 
+/**
+ * Async server component that fetches featured topics and renders them.
+ * Wrapped in Suspense by the parent — shows TopicsSkeleton while loading.
+ */
+async function FeaturedTopicsLoader() {
+    try {
         const featuredPosts = await prisma.post.findMany({
             where: {
                 published: true,
@@ -81,7 +89,7 @@ async function getHomePageData() {
         const posts = await prisma.post.findMany({
             where: { published: true },
             orderBy: { createdAt: 'desc' },
-            take: 6,
+            take: 3,
             select: selectFields,
         });
 
@@ -99,20 +107,27 @@ async function getHomePageData() {
             href: `/posts/${post.slug}`,
         }));
 
-        return { posts, featuredTopics };
+        return <FeaturedTopics topics={featuredTopics} />;
     } catch (error) {
-        console.error('Error fetching home page data:', error);
-        // Error logged on server, return empty data to prevent crash
-        return { posts: [], featuredTopics: [] };
+        console.error('Error fetching featured topics:', error);
+        return null;
     }
 }
 
-export default async function Home() {
-    const { posts, featuredTopics } = await getHomePageData();
+/**
+ * Async server component that fetches recent posts and renders them.
+ * Wrapped in Suspense by the parent — shows PostCardsSkeleton while loading.
+ */
+async function RecentPostsLoader() {
+    try {
+        const posts = await prisma.post.findMany({
+            where: { published: true },
+            orderBy: { createdAt: 'desc' },
+            take: 6,
+            select: selectFields,
+        });
 
-    return (
-        <>
-            <HeroSection topics={featuredTopics} />
+        return (
             <section className="posts-section" aria-label="Blog posts">
                 <PostList
                     posts={posts}
@@ -127,6 +142,25 @@ export default async function Home() {
                     }
                 />
             </section>
+        );
+    } catch (error) {
+        console.error('Error fetching recent posts:', error);
+        return null;
+    }
+}
+
+export default function Home() {
+    return (
+        <>
+            <HeroSection>
+                <Suspense fallback={<TopicsSkeleton />}>
+                    <FeaturedTopicsLoader />
+                </Suspense>
+            </HeroSection>
+            <Suspense fallback={<PostCardsSkeleton />}>
+                <RecentPostsLoader />
+            </Suspense>
         </>
     );
 }
+

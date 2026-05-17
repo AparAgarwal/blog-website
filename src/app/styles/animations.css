@@ -202,3 +202,45 @@
         }
     }
 }
+
+/* ============================================
+   Shimmer / Skeleton Loading Animations
+   ============================================ */
+@keyframes shimmer {
+    0% {
+        background-position: -400px 0;
+    }
+    100% {
+        background-position: 400px 0;
+    }
+}
+
+.shimmer-line {
+    display: block;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(
+        90deg,
+        var(--border-color) 25%,
+        var(--hover-bg) 37%,
+        var(--border-color) 63%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.shimmer-pill {
+    display: inline-block;
+    width: 64px;
+    height: 24px;
+    border-radius: 12px;
+    background: linear-gradient(
+        90deg,
+        var(--border-color) 25%,
+        var(--hover-bg) 37%,
+        var(--border-color) 63%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
